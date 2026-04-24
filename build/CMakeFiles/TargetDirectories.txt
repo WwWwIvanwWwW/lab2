@@ -1,5 +1,0 @@
-/home/ivanend/IT/vscode101/2sem/2lab/build/CMakeFiles/edit_cache.dir
-/home/ivanend/IT/vscode101/2sem/2lab/build/CMakeFiles/rebuild_cache.dir
-/home/ivanend/IT/vscode101/2sem/2lab/build/src/CMakeFiles/LAB_2.dir
-/home/ivanend/IT/vscode101/2sem/2lab/build/src/CMakeFiles/edit_cache.dir
-/home/ivanend/IT/vscode101/2sem/2lab/build/src/CMakeFiles/rebuild_cache.dir
