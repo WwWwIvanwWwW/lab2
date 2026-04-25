@@ -26,7 +26,6 @@ TEST(DynamicArrayTest, ConstructorFromArrayWithNegativeCount)
 
 TEST(DynamicArrayTest, ConstructorFromArrayWithNullptrAndNegativeCount)
 {
-	int items[] = {1, 2, 3};
 	EXPECT_THROW(DynamicArray<int> arr(nullptr, -1), std::invalid_argument);
 }
 
