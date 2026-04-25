@@ -1,0 +1,6 @@
+build/
+doc/
+CMakeLists.txt
+*.o
+LAB_2
+.vscode/
