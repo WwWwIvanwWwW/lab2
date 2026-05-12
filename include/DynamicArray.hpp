@@ -1,5 +1,8 @@
 #pragma once
 
+#include "DynamicArray.hpp"
+#include "LinkedList.hpp"
+#include "Sequence.hpp"
 #include <memory>
 #include <stdexcept>
 
