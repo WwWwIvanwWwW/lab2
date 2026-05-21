@@ -1,45 +1,61 @@
-#include "../include/DynamicArray.hpp"
+#include "DynamicArray.hpp"
 #include <gtest/gtest.h>
+#include <vector>
+
+using namespace std;
+
+#define EXPECT_ARRAY(arr, ...)                                                 \
+	do {                                                                       \
+		auto &a = (arr);                                                       \
+		int expected[] = {__VA_ARGS__};                                        \
+		int expected_size = sizeof(expected) / sizeof(expected[0]);            \
+		EXPECT_EQ(a.GetSize(), expected_size)                                  \
+			<< "Expected size: " << expected_size                              \
+			<< ", actual: " << a.GetSize();                                    \
+		for (int i = 0; i < expected_size && i < a.GetSize(); ++i) {           \
+			EXPECT_EQ(a.Get(i), expected[i])                                   \
+				<< "At index " << i << ": expected " << expected[i]            \
+				<< ", actual " << a.Get(i);                                    \
+		}                                                                      \
+	} while (0)
+
+#define EXPECT_ARRAY_THROW(expression, exception_type)                         \
+	EXPECT_THROW(expression, exception_type)
 
 TEST(DynamicArrayTest, ConstructorFromArray)
 {
 	int items[] = {1, 2, 3, 4, 5};
 	DynamicArray<int> arr(items, 5);
-	EXPECT_EQ(arr.GetSize(), 5);
-	EXPECT_EQ(arr.Get(0), 1);
-	EXPECT_EQ(arr.Get(1), 2);
-	EXPECT_EQ(arr.Get(2), 3);
-	EXPECT_EQ(arr.Get(3), 4);
-	EXPECT_EQ(arr.Get(4), 5);
+	EXPECT_ARRAY(arr, 1, 2, 3, 4, 5);
 }
 
 TEST(DynamicArrayTest, ConstructorFromArrayWithNullptr)
 {
-	EXPECT_THROW(DynamicArray<int> arr(nullptr, 5), std::invalid_argument);
+	EXPECT_ARRAY_THROW(DynamicArray<int> arr(nullptr, 5),
+					   std::invalid_argument);
 }
 
 TEST(DynamicArrayTest, ConstructorFromArrayWithNegativeCount)
 {
 	int items[] = {1, 2, 3};
-	EXPECT_THROW(DynamicArray<int> arr(items, -1), std::invalid_argument);
+	EXPECT_ARRAY_THROW(DynamicArray<int> arr(items, -1), std::invalid_argument);
 }
 
 TEST(DynamicArrayTest, ConstructorFromArrayWithNullptrAndNegativeCount)
 {
-	EXPECT_THROW(DynamicArray<int> arr(nullptr, -1), std::invalid_argument);
+	EXPECT_ARRAY_THROW(DynamicArray<int> arr(nullptr, -1),
+					   std::invalid_argument);
 }
 
 TEST(DynamicArrayTest, ConstructorWithSize)
 {
 	DynamicArray<int> arr(10);
-	EXPECT_EQ(arr.GetSize(), 10);
-	EXPECT_EQ(arr.Get(0), 0);
-	EXPECT_EQ(arr.Get(9), 0);
+	EXPECT_ARRAY(arr, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 }
 
 TEST(DynamicArrayTest, ConstructorWithNegativeSize)
 {
-	EXPECT_THROW(DynamicArray<int> arr(-5), std::invalid_argument);
+	EXPECT_ARRAY_THROW(DynamicArray<int> arr(-5), std::invalid_argument);
 }
 
 TEST(DynamicArrayTest, ConstructorWithZeroSize)
@@ -54,10 +70,7 @@ TEST(DynamicArrayTest, CopyConstructor)
 	DynamicArray<int> arr1(items, 3);
 	DynamicArray<int> arr2(arr1);
 
-	EXPECT_EQ(arr2.GetSize(), 3);
-	EXPECT_EQ(arr2.Get(0), 1);
-	EXPECT_EQ(arr2.Get(1), 2);
-	EXPECT_EQ(arr2.Get(2), 3);
+	EXPECT_ARRAY(arr2, 1, 2, 3);
 
 	arr1.Set(0, 100);
 	EXPECT_EQ(arr2.Get(0), 1);
@@ -72,11 +85,8 @@ TEST(DynamicArrayTest, CopyAssignmentOperator)
 
 	arr2 = arr1;
 
-	EXPECT_EQ(arr2.GetSize(), 3);
-	EXPECT_EQ(arr2.Get(0), 1);
-	EXPECT_EQ(arr2.Get(1), 2);
-	EXPECT_EQ(arr2.Get(2), 3);
-	EXPECT_THROW(arr2.Get(3), std::out_of_range);
+	EXPECT_ARRAY(arr2, 1, 2, 3);
+	EXPECT_ARRAY_THROW(arr2.Get(3), std::out_of_range);
 }
 
 TEST(DynamicArrayTest, MoveConstructor)
@@ -85,10 +95,7 @@ TEST(DynamicArrayTest, MoveConstructor)
 	DynamicArray<int> arr1(items, 3);
 	DynamicArray<int> arr2(std::move(arr1));
 
-	EXPECT_EQ(arr2.GetSize(), 3);
-	EXPECT_EQ(arr2.Get(0), 1);
-	EXPECT_EQ(arr2.Get(1), 2);
-	EXPECT_EQ(arr2.Get(2), 3);
+	EXPECT_ARRAY(arr2, 1, 2, 3);
 	EXPECT_EQ(arr1.GetSize(), 0);
 }
 
@@ -101,10 +108,7 @@ TEST(DynamicArrayTest, MoveAssignmentOperator)
 
 	arr2 = std::move(arr1);
 
-	EXPECT_EQ(arr2.GetSize(), 3);
-	EXPECT_EQ(arr2.Get(0), 1);
-	EXPECT_EQ(arr2.Get(1), 2);
-	EXPECT_EQ(arr2.Get(2), 3);
+	EXPECT_ARRAY(arr2, 1, 2, 3);
 	EXPECT_EQ(arr1.GetSize(), 0);
 }
 
@@ -113,9 +117,9 @@ TEST(DynamicArrayTest, GetInvalidIndex)
 	int items[] = {1, 2, 3};
 	DynamicArray<int> arr(items, 3);
 
-	EXPECT_THROW(arr.Get(-1), std::out_of_range);
-	EXPECT_THROW(arr.Get(3), std::out_of_range);
-	EXPECT_THROW(arr.Get(100), std::out_of_range);
+	EXPECT_ARRAY_THROW(arr.Get(-1), std::out_of_range);
+	EXPECT_ARRAY_THROW(arr.Get(3), std::out_of_range);
+	EXPECT_ARRAY_THROW(arr.Get(100), std::out_of_range);
 }
 
 TEST(DynamicArrayTest, SetValidIndex)
@@ -135,8 +139,8 @@ TEST(DynamicArrayTest, SetInvalidIndex)
 	int items[] = {1, 2, 3};
 	DynamicArray<int> arr(items, 3);
 
-	EXPECT_THROW(arr.Set(-1, 10), std::out_of_range);
-	EXPECT_THROW(arr.Set(3, 10), std::out_of_range);
+	EXPECT_ARRAY_THROW(arr.Set(-1, 10), std::out_of_range);
+	EXPECT_ARRAY_THROW(arr.Set(3, 10), std::out_of_range);
 }
 
 TEST(DynamicArrayTest, ResizeIncrease)
@@ -146,12 +150,7 @@ TEST(DynamicArrayTest, ResizeIncrease)
 
 	arr.Resize(5);
 
-	EXPECT_EQ(arr.GetSize(), 5);
-	EXPECT_EQ(arr.Get(0), 1);
-	EXPECT_EQ(arr.Get(1), 2);
-	EXPECT_EQ(arr.Get(2), 3);
-	EXPECT_EQ(arr.Get(3), 0);
-	EXPECT_EQ(arr.Get(4), 0);
+	EXPECT_ARRAY(arr, 1, 2, 3, 0, 0);
 }
 
 TEST(DynamicArrayTest, ResizeDecrease)
@@ -161,10 +160,7 @@ TEST(DynamicArrayTest, ResizeDecrease)
 
 	arr.Resize(3);
 
-	EXPECT_EQ(arr.GetSize(), 3);
-	EXPECT_EQ(arr.Get(0), 1);
-	EXPECT_EQ(arr.Get(1), 2);
-	EXPECT_EQ(arr.Get(2), 3);
+	EXPECT_ARRAY(arr, 1, 2, 3);
 }
 
 TEST(DynamicArrayTest, ResizeToSameSize)
@@ -174,10 +170,7 @@ TEST(DynamicArrayTest, ResizeToSameSize)
 
 	arr.Resize(3);
 
-	EXPECT_EQ(arr.GetSize(), 3);
-	EXPECT_EQ(arr.Get(0), 1);
-	EXPECT_EQ(arr.Get(1), 2);
-	EXPECT_EQ(arr.Get(2), 3);
+	EXPECT_ARRAY(arr, 1, 2, 3);
 }
 
 TEST(DynamicArrayTest, ResizeToZero)
@@ -193,7 +186,7 @@ TEST(DynamicArrayTest, ResizeToZero)
 TEST(DynamicArrayTest, ResizeNegative)
 {
 	DynamicArray<int> arr(5);
-	EXPECT_THROW(arr.Resize(-10), std::invalid_argument);
+	EXPECT_ARRAY_THROW(arr.Resize(-10), std::invalid_argument);
 }
 
 TEST(DynamicArrayTest, GetSizeOnEmptyArray)
@@ -221,8 +214,10 @@ TEST(DynamicArrayTest, SubscriptOperator)
 {
 	int items[] = {10, 20, 30};
 	DynamicArray<int> arr(items, 3);
+
 	EXPECT_EQ(arr[0], 10);
 	EXPECT_EQ(arr[1], 20);
+
 	arr[1] = 99;
 	EXPECT_EQ(arr[1], 99);
 }
@@ -232,10 +227,7 @@ TEST(DynamicArrayTest, SelfAssignment)
 	int items[] = {1, 2, 3};
 	DynamicArray<int> arr(items, 3);
 	arr = arr;
-	EXPECT_EQ(arr.GetSize(), 3);
-	EXPECT_EQ(arr.Get(0), 1);
-	EXPECT_EQ(arr.Get(1), 2);
-	EXPECT_EQ(arr.Get(2), 3);
+	EXPECT_ARRAY(arr, 1, 2, 3);
 }
 
 TEST(DynamicArrayTest, CopyEmptyArray)
@@ -256,6 +248,7 @@ TEST(DynamicArrayTest, ConstSubscriptOperator)
 {
 	int items[] = {10, 20, 30};
 	const DynamicArray<int> arr(items, 3);
+
 	EXPECT_EQ(arr[0], 10);
 	EXPECT_EQ(arr[1], 20);
 	EXPECT_EQ(arr[2], 30);
@@ -264,5 +257,5 @@ TEST(DynamicArrayTest, ConstSubscriptOperator)
 TEST(DynamicArrayTest, SubscriptOperatorOutOfRange)
 {
 	DynamicArray<int> arr(3);
-	EXPECT_THROW(arr[3], std::out_of_range);
+	EXPECT_ARRAY_THROW(arr[3], std::out_of_range);
 }

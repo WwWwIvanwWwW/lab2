@@ -3,6 +3,21 @@
 #include "LinkedList.hpp"
 #include <gtest/gtest.h>
 
+#define EXPECT_IMMUTABLE_LIST(seq, ...)                                        \
+	do {                                                                       \
+		auto &s = (seq);                                                       \
+		int expected[] = {__VA_ARGS__};                                        \
+		int expected_size = sizeof(expected) / sizeof(expected[0]);            \
+		EXPECT_EQ(s.GetLength(), expected_size)                                \
+			<< "Expected length: " << expected_size                            \
+			<< ", actual: " << s.GetLength();                                  \
+		for (int i = 0; i < expected_size && i < s.GetLength(); ++i) {         \
+			EXPECT_EQ(s.Get(i), expected[i])                                   \
+				<< "At index " << i << ": expected " << expected[i]            \
+				<< ", actual " << s.Get(i);                                    \
+		}                                                                      \
+	} while (0)
+
 TEST(ImmutableListSequenceTest, DefaultConstructor)
 {
 	ImmutableListSequence<int> seq;
@@ -14,9 +29,7 @@ TEST(ImmutableListSequenceTest, ConstructorFromArray)
 {
 	int items[] = {1, 2, 3};
 	ImmutableListSequence<int> seq(items, 3);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 1);
-	EXPECT_EQ(seq.Get(2), 3);
+	EXPECT_IMMUTABLE_LIST(seq, 1, 2, 3);
 }
 
 TEST(ImmutableListSequenceTest, ConstructorFromLinkedList)
@@ -24,8 +37,7 @@ TEST(ImmutableListSequenceTest, ConstructorFromLinkedList)
 	int items[] = {1, 2, 3};
 	LinkedList<int> list(items, 3);
 	ImmutableListSequence<int> seq(list);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 1);
+	EXPECT_IMMUTABLE_LIST(seq, 1, 2, 3);
 }
 
 TEST(ImmutableListSequenceTest, ConstructorFromDynamicArray)
@@ -33,8 +45,7 @@ TEST(ImmutableListSequenceTest, ConstructorFromDynamicArray)
 	int items[] = {1, 2, 3};
 	DynamicArray<int> arr(items, 3);
 	ImmutableListSequence<int> seq(arr);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 1);
+	EXPECT_IMMUTABLE_LIST(seq, 1, 2, 3);
 }
 
 TEST(ImmutableListSequenceTest, CopyConstructor)
@@ -42,8 +53,7 @@ TEST(ImmutableListSequenceTest, CopyConstructor)
 	int items[] = {1, 2, 3};
 	ImmutableListSequence<int> seq1(items, 3);
 	ImmutableListSequence<int> seq2(seq1);
-	EXPECT_EQ(seq2.GetLength(), 3);
-	EXPECT_EQ(seq2.Get(0), 1);
+	EXPECT_IMMUTABLE_LIST(seq2, 1, 2, 3);
 }
 
 TEST(ImmutableListSequenceTest, Append)
@@ -51,9 +61,7 @@ TEST(ImmutableListSequenceTest, Append)
 	ImmutableListSequence<int> seq;
 	seq.Append(10);
 	seq.Append(20);
-	EXPECT_EQ(seq.GetLength(), 2);
-	EXPECT_EQ(seq.Get(0), 10);
-	EXPECT_EQ(seq.Get(1), 20);
+	EXPECT_IMMUTABLE_LIST(seq, 10, 20);
 }
 
 TEST(ImmutableListSequenceTest, Prepend)
@@ -61,9 +69,7 @@ TEST(ImmutableListSequenceTest, Prepend)
 	ImmutableListSequence<int> seq;
 	seq.Prepend(20);
 	seq.Prepend(10);
-	EXPECT_EQ(seq.GetLength(), 2);
-	EXPECT_EQ(seq.Get(0), 10);
-	EXPECT_EQ(seq.Get(1), 20);
+	EXPECT_IMMUTABLE_LIST(seq, 10, 20);
 }
 
 TEST(ImmutableListSequenceTest, InsertAt)
@@ -72,10 +78,7 @@ TEST(ImmutableListSequenceTest, InsertAt)
 	seq.Append(10);
 	seq.Append(30);
 	seq.InsertAt(20, 1);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 10);
-	EXPECT_EQ(seq.Get(1), 20);
-	EXPECT_EQ(seq.Get(2), 30);
+	EXPECT_IMMUTABLE_LIST(seq, 10, 20, 30);
 }
 
 TEST(ImmutableListSequenceTest, GetSubsequence)
@@ -83,9 +86,7 @@ TEST(ImmutableListSequenceTest, GetSubsequence)
 	int items[] = {1, 2, 3, 4, 5};
 	ImmutableListSequence<int> seq(items, 5);
 	auto sub = seq.GetSubsequence(1, 3);
-	EXPECT_EQ(sub->GetLength(), 3);
-	EXPECT_EQ(sub->Get(0), 2);
-	EXPECT_EQ(sub->Get(2), 4);
+	EXPECT_IMMUTABLE_LIST((*sub), 2, 3, 4);
 }
 
 TEST(ImmutableListSequenceTest, Concat)
@@ -95,9 +96,7 @@ TEST(ImmutableListSequenceTest, Concat)
 	ImmutableListSequence<int> seq1(items1, 2);
 	ImmutableListSequence<int> seq2(items2, 2);
 	auto result = seq1.Concat(&seq2);
-	EXPECT_EQ(result->GetLength(), 4);
-	EXPECT_EQ(result->Get(0), 1);
-	EXPECT_EQ(result->Get(2), 3);
+	EXPECT_IMMUTABLE_LIST((*result), 1, 2, 3, 4);
 }
 
 TEST(ImmutableListSequenceTest, MultipleOperationsPreserveOriginal)
@@ -106,6 +105,6 @@ TEST(ImmutableListSequenceTest, MultipleOperationsPreserveOriginal)
 	ImmutableListSequence<int> original(items, 3);
 	ImmutableListSequence<int> modified = original;
 	modified.Append(4);
-	EXPECT_EQ(original.GetLength(), 3);
-	EXPECT_EQ(modified.GetLength(), 4);
+	EXPECT_IMMUTABLE_LIST(original, 1, 2, 3);
+	EXPECT_IMMUTABLE_LIST(modified, 1, 2, 3, 4);
 }

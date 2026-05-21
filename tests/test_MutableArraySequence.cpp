@@ -3,21 +3,37 @@
 #include "MutableArraySequence.hpp"
 #include <gtest/gtest.h>
 
+#define EXPECT_MUTABLE_SEQ(seq, ...)                                           \
+	do {                                                                       \
+		auto &s = (seq);                                                       \
+		int expected[] = {__VA_ARGS__};                                        \
+		int expected_size = sizeof(expected) / sizeof(expected[0]);            \
+		EXPECT_EQ(s.GetLength(), expected_size)                                \
+			<< "Expected length: " << expected_size                            \
+			<< ", actual: " << s.GetLength();                                  \
+		for (int i = 0; i < expected_size && i < s.GetLength(); ++i) {         \
+			EXPECT_EQ(s.Get(i), expected[i])                                   \
+				<< "At index " << i << ": expected " << expected[i]            \
+				<< ", actual " << s.Get(i);                                    \
+		}                                                                      \
+	} while (0)
+
+#define EXPECT_MUTABLE_THROW(expression, exception_type)                       \
+	EXPECT_THROW(expression, exception_type)
+
 TEST(MutableArraySequenceTest, DefaultConstructor)
 {
 	MutableArraySequence<int> seq;
 	EXPECT_EQ(seq.GetLength(), 0);
-	EXPECT_THROW(seq.GetFirst(), std::out_of_range);
-	EXPECT_THROW(seq.GetLast(), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.GetFirst(), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.GetLast(), std::out_of_range);
 }
 
 TEST(MutableArraySequenceTest, ConstructorFromArray)
 {
 	int items[] = {1, 2, 3, 4, 5};
 	MutableArraySequence<int> seq(items, 5);
-	EXPECT_EQ(seq.GetLength(), 5);
-	EXPECT_EQ(seq.Get(0), 1);
-	EXPECT_EQ(seq.Get(4), 5);
+	EXPECT_MUTABLE_SEQ(seq, 1, 2, 3, 4, 5);
 }
 
 TEST(MutableArraySequenceTest, ConstructorFromDynamicArray)
@@ -25,9 +41,7 @@ TEST(MutableArraySequenceTest, ConstructorFromDynamicArray)
 	int items[] = {1, 2, 3};
 	DynamicArray<int> arr(items, 3);
 	MutableArraySequence<int> seq(arr);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 1);
-	EXPECT_EQ(seq.Get(2), 3);
+	EXPECT_MUTABLE_SEQ(seq, 1, 2, 3);
 }
 
 TEST(MutableArraySequenceTest, ConstructorFromLinkedList)
@@ -35,9 +49,7 @@ TEST(MutableArraySequenceTest, ConstructorFromLinkedList)
 	int items[] = {1, 2, 3};
 	LinkedList<int> list(items, 3);
 	MutableArraySequence<int> seq(list);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 1);
-	EXPECT_EQ(seq.Get(2), 3);
+	EXPECT_MUTABLE_SEQ(seq, 1, 2, 3);
 }
 
 TEST(MutableArraySequenceTest, CopyConstructor)
@@ -45,8 +57,9 @@ TEST(MutableArraySequenceTest, CopyConstructor)
 	int items[] = {1, 2, 3};
 	MutableArraySequence<int> seq1(items, 3);
 	MutableArraySequence<int> seq2(seq1);
-	EXPECT_EQ(seq2.GetLength(), 3);
-	EXPECT_EQ(seq2.Get(0), 1);
+
+	EXPECT_MUTABLE_SEQ(seq2, 1, 2, 3);
+
 	seq1.Append(100);
 	EXPECT_EQ(seq2.GetLength(), 3);
 }
@@ -57,10 +70,10 @@ TEST(MutableArraySequenceTest, CopyAssignment)
 	int items2[] = {4, 5};
 	MutableArraySequence<int> seq1(items1, 3);
 	MutableArraySequence<int> seq2(items2, 2);
+
 	seq2 = seq1;
-	EXPECT_EQ(seq2.GetLength(), 3);
-	EXPECT_EQ(seq2.Get(0), 1);
-	EXPECT_EQ(seq2.Get(2), 3);
+
+	EXPECT_MUTABLE_SEQ(seq2, 1, 2, 3);
 }
 
 TEST(MutableArraySequenceTest, GetFirst)
@@ -73,7 +86,7 @@ TEST(MutableArraySequenceTest, GetFirst)
 TEST(MutableArraySequenceTest, GetFirstOnEmpty)
 {
 	MutableArraySequence<int> seq;
-	EXPECT_THROW(seq.GetFirst(), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.GetFirst(), std::out_of_range);
 }
 
 TEST(MutableArraySequenceTest, GetLast)
@@ -86,7 +99,7 @@ TEST(MutableArraySequenceTest, GetLast)
 TEST(MutableArraySequenceTest, GetLastOnEmpty)
 {
 	MutableArraySequence<int> seq;
-	EXPECT_THROW(seq.GetLast(), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.GetLast(), std::out_of_range);
 }
 
 TEST(MutableArraySequenceTest, GetValidIndex)
@@ -102,8 +115,8 @@ TEST(MutableArraySequenceTest, GetInvalidIndex)
 {
 	int items[] = {1, 2, 3};
 	MutableArraySequence<int> seq(items, 3);
-	EXPECT_THROW(seq.Get(-1), std::out_of_range);
-	EXPECT_THROW(seq.Get(3), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.Get(-1), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.Get(3), std::out_of_range);
 }
 
 TEST(MutableArraySequenceTest, GetSubsequence)
@@ -111,19 +124,16 @@ TEST(MutableArraySequenceTest, GetSubsequence)
 	int items[] = {1, 2, 3, 4, 5};
 	MutableArraySequence<int> seq(items, 5);
 	auto sub = seq.GetSubsequence(1, 3);
-	EXPECT_EQ(sub->GetLength(), 3);
-	EXPECT_EQ(sub->Get(0), 2);
-	EXPECT_EQ(sub->Get(1), 3);
-	EXPECT_EQ(sub->Get(2), 4);
+	EXPECT_MUTABLE_SEQ((*sub), 2, 3, 4);
 }
 
 TEST(MutableArraySequenceTest, GetSubsequenceInvalid)
 {
 	int items[] = {1, 2, 3};
 	MutableArraySequence<int> seq(items, 3);
-	EXPECT_THROW(seq.GetSubsequence(-1, 2), std::out_of_range);
-	EXPECT_THROW(seq.GetSubsequence(0, 3), std::out_of_range);
-	EXPECT_THROW(seq.GetSubsequence(2, 1), std::invalid_argument);
+	EXPECT_MUTABLE_THROW(seq.GetSubsequence(-1, 2), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.GetSubsequence(0, 3), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.GetSubsequence(2, 1), std::invalid_argument);
 }
 
 TEST(MutableArraySequenceTest, Append)
@@ -132,10 +142,7 @@ TEST(MutableArraySequenceTest, Append)
 	seq.Append(10);
 	seq.Append(20);
 	seq.Append(30);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 10);
-	EXPECT_EQ(seq.Get(1), 20);
-	EXPECT_EQ(seq.Get(2), 30);
+	EXPECT_MUTABLE_SEQ(seq, 10, 20, 30);
 }
 
 TEST(MutableArraySequenceTest, Prepend)
@@ -144,10 +151,7 @@ TEST(MutableArraySequenceTest, Prepend)
 	seq.Prepend(30);
 	seq.Prepend(20);
 	seq.Prepend(10);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 10);
-	EXPECT_EQ(seq.Get(1), 20);
-	EXPECT_EQ(seq.Get(2), 30);
+	EXPECT_MUTABLE_SEQ(seq, 10, 20, 30);
 }
 
 TEST(MutableArraySequenceTest, InsertAt)
@@ -155,10 +159,7 @@ TEST(MutableArraySequenceTest, InsertAt)
 	int items[] = {10, 30};
 	MutableArraySequence<int> seq(items, 2);
 	seq.InsertAt(20, 1);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 10);
-	EXPECT_EQ(seq.Get(1), 20);
-	EXPECT_EQ(seq.Get(2), 30);
+	EXPECT_MUTABLE_SEQ(seq, 10, 20, 30);
 }
 
 TEST(MutableArraySequenceTest, InsertAtBeginning)
@@ -166,9 +167,7 @@ TEST(MutableArraySequenceTest, InsertAtBeginning)
 	int items[] = {20, 30};
 	MutableArraySequence<int> seq(items, 2);
 	seq.InsertAt(10, 0);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(0), 10);
-	EXPECT_EQ(seq.Get(1), 20);
+	EXPECT_MUTABLE_SEQ(seq, 10, 20, 30);
 }
 
 TEST(MutableArraySequenceTest, InsertAtEnd)
@@ -176,16 +175,15 @@ TEST(MutableArraySequenceTest, InsertAtEnd)
 	int items[] = {10, 20};
 	MutableArraySequence<int> seq(items, 2);
 	seq.InsertAt(30, 2);
-	EXPECT_EQ(seq.GetLength(), 3);
-	EXPECT_EQ(seq.Get(2), 30);
+	EXPECT_MUTABLE_SEQ(seq, 10, 20, 30);
 }
 
 TEST(MutableArraySequenceTest, InsertAtInvalidIndex)
 {
 	int items[] = {1, 2, 3};
 	MutableArraySequence<int> seq(items, 3);
-	EXPECT_THROW(seq.InsertAt(99, -1), std::out_of_range);
-	EXPECT_THROW(seq.InsertAt(99, 4), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.InsertAt(99, -1), std::out_of_range);
+	EXPECT_MUTABLE_THROW(seq.InsertAt(99, 4), std::out_of_range);
 }
 
 TEST(MutableArraySequenceTest, Concat)
@@ -195,10 +193,7 @@ TEST(MutableArraySequenceTest, Concat)
 	MutableArraySequence<int> seq1(items1, 3);
 	MutableArraySequence<int> seq2(items2, 3);
 	auto result = seq1.Concat(&seq2);
-	EXPECT_EQ(result->GetLength(), 6);
-	EXPECT_EQ(result->Get(0), 1);
-	EXPECT_EQ(result->Get(3), 4);
-	EXPECT_EQ(result->Get(5), 6);
+	EXPECT_MUTABLE_SEQ((*result), 1, 2, 3, 4, 5, 6);
 }
 
 TEST(MutableArraySequenceTest, ConcatWithEmpty)
@@ -207,5 +202,5 @@ TEST(MutableArraySequenceTest, ConcatWithEmpty)
 	MutableArraySequence<int> seq1(items, 3);
 	MutableArraySequence<int> seq2;
 	auto result = seq1.Concat(&seq2);
-	EXPECT_EQ(result->GetLength(), 3);
+	EXPECT_MUTABLE_SEQ((*result), 1, 2, 3);
 }
