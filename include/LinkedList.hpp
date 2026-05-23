@@ -29,8 +29,8 @@ template <class T> class LinkedList
 	LinkedList<T> &operator=(LinkedList<T> &&other) noexcept;
 	~LinkedList() = default;
 
+	T &operator[](int index);
 	void swap(LinkedList<T> &other) noexcept;
-
 	T GetFirst() const;
 	T GetLast() const;
 	T Get(int index) const;

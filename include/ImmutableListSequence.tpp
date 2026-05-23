@@ -49,6 +49,13 @@ ImmutableListSequence<T>::operator=(const ImmutableListSequence<T> &other)
 	return *this;
 }
 
+template <class T>
+const T &ImmutableListSequence<T>::operator[](int index) const
+{
+	validateIndex(index);
+	return (*m_data)[index];
+}
+
 template <class T> T ImmutableListSequence<T>::GetFirst() const
 {
 	return m_data->GetFirst();

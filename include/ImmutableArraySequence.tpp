@@ -51,6 +51,13 @@ ImmutableArraySequence<T>::operator=(const ImmutableArraySequence<T> &other)
 	return *this;
 }
 
+template <class T>
+const T &ImmutableArraySequence<T>::operator[](int index) const
+{
+	validateIndex(index);
+	return (*m_data)[index];
+}
+
 template <class T> T ImmutableArraySequence<T>::GetFirst() const
 {
 	if (GetLength() == 0) {

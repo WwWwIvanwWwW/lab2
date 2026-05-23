@@ -26,6 +26,7 @@ template <class T> class ImmutableArraySequence : public Sequence<T>
 	operator=(ImmutableArraySequence<T> &&other) noexcept = default;
 	~ImmutableArraySequence() = default;
 
+	const T &operator[](int index) const;
 	T GetFirst() const override;
 	T GetLast() const override;
 	T Get(int index) const override;

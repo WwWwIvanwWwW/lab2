@@ -24,6 +24,7 @@ template <class T> class ImmutableListSequence : public Sequence<T>
 	operator=(ImmutableListSequence<T> &&other) noexcept = default;
 	~ImmutableListSequence() = default;
 
+	const T &operator[](int index) const;
 	T GetFirst() const override;
 	T GetLast() const override;
 	T Get(int index) const override;

@@ -26,7 +26,6 @@ template <class T> class DynamicArray
 
 	T &operator[](int index);
 	const T &operator[](int index) const;
-
 	T Get(int index) const;
 	int GetSize() const;
 	void Set(int index, T value);

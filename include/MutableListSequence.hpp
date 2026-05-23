@@ -24,6 +24,7 @@ template <class T> class MutableListSequence : public Sequence<T>
 	operator=(MutableListSequence<T> &&other) noexcept = default;
 	~MutableListSequence() = default;
 
+	T &operator[](int index);
 	T GetFirst() const override;
 	T GetLast() const override;
 	T Get(int index) const override;

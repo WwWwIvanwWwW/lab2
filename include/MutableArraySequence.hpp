@@ -23,6 +23,7 @@ template <class T> class MutableArraySequence : public Sequence<T>
 	operator=(MutableArraySequence<T> &&other) noexcept = default;
 	~MutableArraySequence() = default;
 
+	T &operator[](int index);
 	T GetFirst() const override;
 	T GetLast() const override;
 	T Get(int index) const override;

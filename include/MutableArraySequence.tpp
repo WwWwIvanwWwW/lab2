@@ -50,6 +50,12 @@ MutableArraySequence<T>::operator=(const MutableArraySequence<T> &other)
 	return *this;
 }
 
+template <class T> T &MutableArraySequence<T>::operator[](int index)
+{
+	validateIndex(index);
+	return (*m_data)[index];
+}
+
 template <class T> T MutableArraySequence<T>::GetFirst() const
 {
 	if (GetLength() == 0) {

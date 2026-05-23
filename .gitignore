@@ -5,3 +5,5 @@ CMakeLists.txt
 LAB_2
 .vscode/
 libs/
+pyside_env/
+__pycache__

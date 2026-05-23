@@ -82,6 +82,12 @@ LinkedList<T> &LinkedList<T>::operator=(LinkedList<T> &&other) noexcept
 	return *this;
 }
 
+template <class T> T &LinkedList<T>::operator[](int index)
+{
+	validateIndex(index);
+	return getNode(index)->data;
+}
+
 template <class T> void LinkedList<T>::swap(LinkedList<T> &other) noexcept
 {
 	std::swap(m_head, other.m_head);
