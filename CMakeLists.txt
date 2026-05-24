@@ -14,6 +14,9 @@ add_library(sequence_lib SHARED
     src/Bit.cpp
     src/BitSequence.cpp
     src/sequence_api.cpp
+    doc/ImmutableListSequence.hpp
+    include/ImmutableListSequenceBuilder.hpp
+    include/ImmutableArraySequenceBuilder.hpp
 )
 
 enable_testing()

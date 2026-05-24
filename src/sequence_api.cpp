@@ -141,7 +141,6 @@ DEFINE_SEQUENCE(ImmutableArraySequence, ImmutableArraySequence<int>)
 DEFINE_SEQUENCE(MutableListSequence, MutableListSequence<int>)
 DEFINE_SEQUENCE(ImmutableListSequence, ImmutableListSequence<int>)
 
-// ============ BitSequence ============
 void *BitSequence_new()
 {
 	try {
