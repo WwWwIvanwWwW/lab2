@@ -1,7 +1,7 @@
 #pragma once
 
+#include <functional>
 #include <memory>
-
 template <class T> class Sequence
 {
   public:
@@ -18,4 +18,9 @@ template <class T> class Sequence
 	virtual void Prepend(T item) = 0;
 	virtual void InsertAt(T item, int index) = 0;
 	virtual std::unique_ptr<Sequence<T>> Concat(Sequence<T> *other) const = 0;
+
+	virtual std::unique_ptr<Sequence<T>>
+	Map(std::function<T(const T &)> func) const = 0;
+	virtual T Reduce(std::function<T(const T &, const T &)> func,
+					 T c) const = 0;
 };

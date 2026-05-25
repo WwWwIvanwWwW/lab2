@@ -164,3 +164,25 @@ MutableArraySequence<T>::Concat(Sequence<T> *other) const
 	}
 	return result;
 }
+
+template <class T>
+std::unique_ptr<Sequence<T>>
+MutableArraySequence<T>::Map(std::function<T(const T &)> func) const
+{
+	auto result = std::make_unique<MutableArraySequence<T>>();
+	for (int i = 0; i < GetLength(); ++i) {
+		result->Append(func(m_data->Get(i)));
+	}
+	return result;
+}
+
+template <class T>
+T MutableArraySequence<T>::Reduce(std::function<T(const T &, const T &)> func,
+								  T c) const
+{
+	T result = c;
+	for (int i = 0; i < GetLength(); ++i) {
+		result = func(m_data->Get(i), result);
+	}
+	return result;
+}
