@@ -1,83 +1,3 @@
-template <class T> void MutableArraySequence<T>::validateIndex(int index) const
-{
-	if (index < 0 || index >= GetLength()) {
-		throw std::out_of_range("IndexOutOfRange");
-	}
-}
-
-template <class T>
-MutableArraySequence<T>::MutableArraySequence()
-	: m_data(std::make_unique<DynamicArray<T>>())
-{
-}
-
-template <class T>
-MutableArraySequence<T>::MutableArraySequence(T *items, int count)
-	: m_data(std::make_unique<DynamicArray<T>>(items, count))
-{
-}
-
-template <class T>
-MutableArraySequence<T>::MutableArraySequence(const DynamicArray<T> &array)
-	: m_data(std::make_unique<DynamicArray<T>>(array))
-{
-}
-
-template <class T>
-MutableArraySequence<T>::MutableArraySequence(const LinkedList<T> &list)
-	: m_data(std::make_unique<DynamicArray<T>>())
-{
-	for (int i = 0; i < list.GetLength(); ++i) {
-		m_data->Resize(m_data->GetSize() + 1);
-		m_data->Set(m_data->GetSize() - 1, list.Get(i));
-	}
-}
-
-template <class T>
-MutableArraySequence<T>::MutableArraySequence(
-	const MutableArraySequence<T> &other)
-	: m_data(std::make_unique<DynamicArray<T>>(*other.m_data))
-{
-}
-
-template <class T>
-MutableArraySequence<T> &
-MutableArraySequence<T>::operator=(const MutableArraySequence<T> &other)
-{
-	if (this != &other) {
-		m_data = std::make_unique<DynamicArray<T>>(*other.m_data);
-	}
-	return *this;
-}
-
-template <class T> T &MutableArraySequence<T>::operator[](int index)
-{
-	validateIndex(index);
-	return (*m_data)[index];
-}
-
-template <class T> T MutableArraySequence<T>::GetFirst() const
-{
-	if (GetLength() == 0) {
-		throw std::out_of_range("IndexOutOfRange");
-	}
-	return m_data->Get(0);
-}
-
-template <class T> T MutableArraySequence<T>::GetLast() const
-{
-	if (GetLength() == 0) {
-		throw std::out_of_range("IndexOutOfRange");
-	}
-	return m_data->Get(GetLength() - 1);
-}
-
-template <class T> T MutableArraySequence<T>::Get(int index) const
-{
-	validateIndex(index);
-	return m_data->Get(index);
-}
-
 template <class T>
 std::unique_ptr<Sequence<T>>
 MutableArraySequence<T>::GetSubsequence(int startIndex, int endIndex) const
@@ -98,11 +18,6 @@ MutableArraySequence<T>::GetSubsequence(int startIndex, int endIndex) const
 		subseq->Append(m_data->Get(i));
 	}
 	return subseq;
-}
-
-template <class T> int MutableArraySequence<T>::GetLength() const
-{
-	return m_data->GetSize();
 }
 
 template <class T> void MutableArraySequence<T>::Append(T item)
