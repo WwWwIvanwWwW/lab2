@@ -32,12 +32,11 @@ class BitSequence : public Sequence<Bit>
 
 		bool operator==(const Bit &other) const
 		{
-			return m_seq.getBit(m_index) == other.GetValue();
+			return m_seq.Get(m_index).GetValue() == other.GetValue();
 		}
 
 		bool operator!=(const Bit &other) const { return !(*this == other); }
 	};
-	friend class BitProxy;
 
   public:
 	BitSequence();
@@ -65,6 +64,10 @@ class BitSequence : public Sequence<Bit>
 	BitSequence operator|(const BitSequence &other) const;
 	BitSequence operator^(const BitSequence &other) const;
 	BitSequence operator~() const;
+	std::unique_ptr<Sequence<Bit>>
+	Map(std::function<Bit(const Bit &)> func) const override;
+	Bit Reduce(std::function<Bit(const Bit &, const Bit &)> func,
+			   Bit c) const override;
 
 	bool operator==(const BitSequence &other) const;
 	bool operator!=(const BitSequence &other) const;

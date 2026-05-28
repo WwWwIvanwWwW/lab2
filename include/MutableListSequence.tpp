@@ -129,3 +129,25 @@ MutableListSequence<T>::Concat(Sequence<T> *other) const
 	}
 	return result;
 }
+
+template <class T>
+std::unique_ptr<Sequence<T>>
+MutableListSequence<T>::Map(std::function<T(const T &)> func) const
+{
+	auto result = std::make_unique<MutableListSequence<T>>();
+	for (int i = 0; i < this->GetLength(); ++i) {
+		result->Append(func(this->Get(i)));
+	}
+	return result;
+}
+
+template <class T>
+T MutableListSequence<T>::Reduce(std::function<T(const T &, const T &)> func,
+								 T c) const
+{
+	T result = c;
+	for (int i = 0; i < this->GetLength(); ++i) {
+		result = func(this->Get(i), result);
+	}
+	return result;
+}

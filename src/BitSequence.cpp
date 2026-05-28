@@ -1,4 +1,5 @@
 #include "BitSequence.hpp"
+#include "MutableArraySequence.hpp"
 #include <utility>
 
 BitSequence::BitSequence() : m_data(nullptr), m_length(0) {}
@@ -287,6 +288,26 @@ BitSequence BitSequence::operator~() const
 	BitSequence result(m_length);
 	for (int i = 0; i < m_length; ++i) {
 		result.setBit(i, !getBit(i));
+	}
+	return result;
+}
+
+std::unique_ptr<Sequence<Bit>>
+BitSequence::Map(std::function<Bit(const Bit &)> func) const
+{
+	auto result = std::make_unique<MutableArraySequence<Bit>>();
+	for (int i = 0; i < GetLength(); ++i) {
+		result->Append(func(Get(i)));
+	}
+	return result;
+}
+
+Bit BitSequence::Reduce(std::function<Bit(const Bit &, const Bit &)> func,
+						Bit c) const
+{
+	Bit result = c;
+	for (int i = 0; i < GetLength(); ++i) {
+		result = func(Get(i), result);
 	}
 	return result;
 }

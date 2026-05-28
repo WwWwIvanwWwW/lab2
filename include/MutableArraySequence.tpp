@@ -2,10 +2,10 @@ template <class T>
 std::unique_ptr<Sequence<T>>
 MutableArraySequence<T>::GetSubsequence(int startIndex, int endIndex) const
 {
-	if (startIndex < 0 || startIndex >= GetLength()) {
+	if (startIndex < 0 || startIndex >= this->GetLength()) {
 		throw std::out_of_range("IndexOutOfRange");
 	}
-	if (endIndex < 0 || endIndex >= GetLength()) {
+	if (endIndex < 0 || endIndex >= this->GetLength()) {
 		throw std::out_of_range("IndexOutOfRange");
 	}
 	if (startIndex > endIndex) {
@@ -15,26 +15,26 @@ MutableArraySequence<T>::GetSubsequence(int startIndex, int endIndex) const
 
 	auto subseq = std::make_unique<MutableArraySequence<T>>();
 	for (int i = startIndex; i <= endIndex; ++i) {
-		subseq->Append(m_data->Get(i));
+		subseq->Append(this->m_data->Get(i));
 	}
 	return subseq;
 }
 
 template <class T> void MutableArraySequence<T>::Append(T item)
 {
-	m_data->Resize(m_data->GetSize() + 1);
-	m_data->Set(m_data->GetSize() - 1, item);
+	this->m_data->Resize(this->m_data->GetSize() + 1);
+	this->m_data->Set(this->m_data->GetSize() - 1, item);
 }
 
 template <class T> void MutableArraySequence<T>::Prepend(T item)
 {
-	int newSize = m_data->GetSize() + 1;
+	int newSize = this->m_data->GetSize() + 1;
 	auto newData = std::make_unique<DynamicArray<T>>(newSize);
 	newData->Set(0, item);
-	for (int i = 0; i < m_data->GetSize(); ++i) {
-		newData->Set(i + 1, m_data->Get(i));
+	for (int i = 0; i < this->m_data->GetSize(); ++i) {
+		newData->Set(i + 1, this->m_data->Get(i));
 	}
-	m_data = std::move(newData);
+	this->m_data = std::move(newData);
 }
 
 template <class T> void MutableArraySequence<T>::InsertAt(T item, int index)
@@ -43,23 +43,23 @@ template <class T> void MutableArraySequence<T>::InsertAt(T item, int index)
 		Prepend(item);
 		return;
 	}
-	if (index == GetLength()) {
+	if (index == this->GetLength()) {
 		Append(item);
 		return;
 	}
 
-	validateIndex(index);
+	this->validateIndex(index);
 
-	int newSize = m_data->GetSize() + 1;
+	int newSize = this->m_data->GetSize() + 1;
 	auto newData = std::make_unique<DynamicArray<T>>(newSize);
 	for (int i = 0; i < index; ++i) {
-		newData->Set(i, m_data->Get(i));
+		newData->Set(i, this->m_data->Get(i));
 	}
 	newData->Set(index, item);
-	for (int i = index; i < m_data->GetSize(); ++i) {
-		newData->Set(i + 1, m_data->Get(i));
+	for (int i = index; i < this->m_data->GetSize(); ++i) {
+		newData->Set(i + 1, this->m_data->Get(i));
 	}
-	m_data = std::move(newData);
+	this->m_data = std::move(newData);
 }
 
 template <class T>
@@ -71,8 +71,8 @@ MutableArraySequence<T>::Concat(Sequence<T> *other) const
 	}
 
 	auto result = std::make_unique<MutableArraySequence<T>>();
-	for (int i = 0; i < GetLength(); ++i) {
-		result->Append(m_data->Get(i));
+	for (int i = 0; i < this->GetLength(); ++i) {
+		result->Append(this->m_data->Get(i));
 	}
 	for (int i = 0; i < other->GetLength(); ++i) {
 		result->Append(other->Get(i));
@@ -85,8 +85,8 @@ std::unique_ptr<Sequence<T>>
 MutableArraySequence<T>::Map(std::function<T(const T &)> func) const
 {
 	auto result = std::make_unique<MutableArraySequence<T>>();
-	for (int i = 0; i < GetLength(); ++i) {
-		result->Append(func(m_data->Get(i)));
+	for (int i = 0; i < this->GetLength(); ++i) {
+		result->Append(func(this->m_data->Get(i)));
 	}
 	return result;
 }
@@ -96,8 +96,8 @@ T MutableArraySequence<T>::Reduce(std::function<T(const T &, const T &)> func,
 								  T c) const
 {
 	T result = c;
-	for (int i = 0; i < GetLength(); ++i) {
-		result = func(m_data->Get(i), result);
+	for (int i = 0; i < this->GetLength(); ++i) {
+		result = func(this->m_data->Get(i), result);
 	}
 	return result;
 }
