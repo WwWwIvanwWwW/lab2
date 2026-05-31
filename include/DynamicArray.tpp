@@ -57,13 +57,13 @@ DynamicArray<T> &DynamicArray<T>::operator=(const DynamicArray<T> &other)
 }
 
 template <class T>
-DynamicArray<T>::DynamicArray(DynamicArray<T> &&other) noexcept
+DynamicArray<T>::DynamicArray(DynamicArray<T> &&other)
 	: m_data(std::move(other.m_data)), m_size(std::exchange(other.m_size, 0))
 {
 }
 
 template <class T>
-DynamicArray<T> &DynamicArray<T>::operator=(DynamicArray<T> &&other) noexcept
+DynamicArray<T> &DynamicArray<T>::operator=(DynamicArray<T> &&other)
 {
 	if (this != &other) {
 		m_data = std::move(other.m_data);

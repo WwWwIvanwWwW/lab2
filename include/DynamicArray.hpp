@@ -1,8 +1,5 @@
 #pragma once
 
-#include "DynamicArray.hpp"
-#include "LinkedList.hpp"
-#include "Sequence.hpp"
 #include <memory>
 #include <stdexcept>
 
@@ -20,8 +17,8 @@ template <class T> class DynamicArray
 	explicit DynamicArray(int size);
 	DynamicArray(const DynamicArray<T> &other);
 	DynamicArray<T> &operator=(const DynamicArray<T> &other);
-	DynamicArray(DynamicArray<T> &&other) noexcept;
-	DynamicArray<T> &operator=(DynamicArray<T> &&other) noexcept;
+	DynamicArray(DynamicArray<T> &&other);
+	DynamicArray<T> &operator=(DynamicArray<T> &&other);
 	~DynamicArray() = default;
 
 	T &operator[](int index);
