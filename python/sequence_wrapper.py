@@ -1,3 +1,4 @@
+# type: ignore
 import ctypes
 import os
 from typing import Optional, Any
@@ -209,3 +210,108 @@ for cls in ["MutableArraySequence", "ImmutableArraySequence", "MutableListSequen
     func = getattr(_lib, f"{cls}_clear")
     func.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
     func.restype = ctypes.c_int
+    
+
+_lib.VectorInt_new.argtypes = []
+_lib.VectorInt_new.restype = ctypes.c_void_p
+_lib.VectorInt_delete.argtypes = [ctypes.c_void_p]
+_lib.VectorInt_delete.restype = ctypes.c_int
+_lib.VectorInt_getSize.argtypes = [ctypes.c_void_p]
+_lib.VectorInt_getSize.restype = ctypes.c_int
+_lib.VectorInt_get.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+_lib.VectorInt_get.restype = ctypes.c_int
+_lib.VectorInt_set.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
+_lib.VectorInt_set.restype = ctypes.c_int
+_lib.VectorInt_add.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(ctypes.c_int)]
+_lib.VectorInt_add.restype = ctypes.c_void_p
+_lib.VectorInt_sub.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(ctypes.c_int)]
+_lib.VectorInt_sub.restype = ctypes.c_void_p
+_lib.VectorInt_mul.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.POINTER(ctypes.c_int)]
+_lib.VectorInt_mul.restype = ctypes.c_void_p
+_lib.VectorInt_norm.argtypes = [ctypes.c_void_p, ctypes.POINTER(ctypes.c_double)]
+_lib.VectorInt_norm.restype = ctypes.c_int
+_lib.VectorInt_dot.argtypes = [ctypes.c_void_p, ctypes.c_void_p, ctypes.POINTER(ctypes.c_int)]
+_lib.VectorInt_dot.restype = ctypes.c_int
+_lib.VectorInt_toString.argtypes = [ctypes.c_void_p]
+_lib.VectorInt_toString.restype = ctypes.c_char_p
+_lib.VectorInt_clear.argtypes = [ctypes.POINTER(ctypes.c_void_p)]
+_lib.VectorInt_clear.restype = ctypes.c_int
+_lib.VectorInt_new_with_size.argtypes = [ctypes.c_int]
+_lib.VectorInt_new_with_size.restype = ctypes.c_void_p
+
+class VectorInt:
+    def __init__(self, size=None):
+        if size is None:
+            self.obj = _lib.VectorInt_new()
+        else:
+            self.obj = _lib.VectorInt_new_with_size(size)
+        if not self.obj:
+            raise RuntimeError("Failed to create VectorInt")
+    
+    def __del__(self):
+        if hasattr(self, 'obj') and self.obj:
+            _lib.VectorInt_delete(self.obj)
+            self.obj = None
+    
+    def _check_ok(self, ok, msg):
+        if not ok:
+            raise RuntimeError(msg)
+    
+    def get_size(self) -> int:
+        return _lib.VectorInt_getSize(self.obj)
+    
+    def get(self, index: int) -> int:
+        err = ctypes.c_int(0)
+        val = _lib.VectorInt_get(self.obj, index, ctypes.byref(err))
+        if err.value:
+            raise IndexError("Index out of range")
+        return val
+    
+    def set(self, index: int, value: int) -> None:
+        ok = _lib.VectorInt_set(self.obj, index, value)
+        self._check_ok(ok, "Set failed")
+    
+    def add(self, other):
+        err = ctypes.c_int(0)
+        obj = _lib.VectorInt_add(self.obj, other.obj, ctypes.byref(err))
+        if err.value or not obj:
+            raise RuntimeError("Addition failed")
+        return VectorInt(obj)
+    
+    def sub(self, other):
+        err = ctypes.c_int(0)
+        obj = _lib.VectorInt_sub(self.obj, other.obj, ctypes.byref(err))
+        if err.value or not obj:
+            raise RuntimeError("Subtraction failed")
+        return VectorInt(obj)
+    
+    def mul(self, scalar: int):
+        err = ctypes.c_int(0)
+        obj = _lib.VectorInt_mul(self.obj, scalar, ctypes.byref(err))
+        if err.value or not obj:
+            raise RuntimeError("Multiplication failed")
+        return VectorInt(obj)
+    
+    def norm(self) -> float:
+        err = ctypes.c_double(0.0)
+        ok = _lib.VectorInt_norm(self.obj, ctypes.byref(err))
+        if not ok:
+            raise RuntimeError("Norm calculation failed")
+        return err.value
+    
+    def dot(self, other) -> int:
+        err = ctypes.c_int(0)
+        val = _lib.VectorInt_dot(self.obj, other.obj, ctypes.byref(err))
+        if err.value:
+            raise RuntimeError("Dot product failed")
+        return val
+    
+    def to_string(self) -> str:
+        result = _lib.VectorInt_toString(self.obj)
+        if result:
+            return result.decode('utf-8')
+        return "[]"
+    
+    def clear(self) -> None:
+        ok = _lib.VectorInt_clear(ctypes.byref(self.obj))
+        self._check_ok(ok, "Clear failed")

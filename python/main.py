@@ -5,8 +5,9 @@ from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QIntValidator, QRegularExpressionValidator
 from PySide6.QtCore import QRegularExpression
 
-from sequence_wrapper import MutableArraySequence, ImmutableArraySequence, MutableListSequence, BitSequence
+from sequence_wrapper import MutableArraySequence, ImmutableArraySequence, MutableListSequence, BitSequence, VectorInt
 
+MAX_INDEX=9999
 
 class SequenceEditor(QDialog):
     def __init__(self, parent=None):
@@ -28,7 +29,7 @@ class SequenceEditor(QDialog):
         self.value_edit.setPlaceholderText("Значение")
         self.value_edit.setValidator(QIntValidator())
         self.index_spin = QSpinBox()
-        self.index_spin.setRange(0, 9999)
+        self.index_spin.setRange(0, MAX_INDEX)
         btn_append = QPushButton("Append")
         btn_clear = QPushButton("Clear")
         input_layout.addWidget(self.value_edit)
@@ -91,7 +92,7 @@ class BitSequenceEditor(QDialog):
         self.bit_edit.setPlaceholderText("Бит (0/1)")
         self.bit_edit.setValidator(QRegularExpressionValidator(QRegularExpression("[01]")))
         self.index_spin = QSpinBox()
-        self.index_spin.setRange(0, 9999)
+        self.index_spin.setRange(0, MAX_INDEX)
         btn_append = QPushButton("Append")
         btn_clear = QPushButton("Clear")
         input_layout.addWidget(self.bit_edit)
@@ -137,19 +138,23 @@ class BitSequenceEditor(QDialog):
 class SequenceTester(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("АТД Sequence Tester — Демонстрация")
+        self.setWindowTitle("Sequence Tester")
         self.resize(1920, 1080)
         
         self.mutable_array_seq = MutableArraySequence()
         self.immutable_array_seq = ImmutableArraySequence()
         self.mutable_list_seq = MutableListSequence()
         self.bit_seq = BitSequence()
+        self.v_seq = VectorInt()
+        self.v_second_seq = VectorInt()
         
         self._setup_ui()
         self._update_mutable_array_display()
         self._update_immutable_array_display()
         self._update_mutable_list_display()
         self._update_bit_display()
+        self._update_vector_display()
+
     
     def _setup_ui(self):
         central = QWidget()
@@ -160,19 +165,17 @@ class SequenceTester(QMainWindow):
         layout.addWidget(self.tabs)
         
         self._setup_mutable_array_tab()
-        
         self._setup_immutable_array_tab()
-        
         self._setup_mutable_list_tab()
-        
         self._setup_bit_tab()
+        self._setup_vector_tab()
         
         self.status_bar = QStatusBar()
         self.setStatusBar(self.status_bar)
         self.status_bar.showMessage("Готов")
     
     def _show_status(self, msg, error=False):
-        prefix = "⚠️ " if error else "✓ "
+        prefix = "❌ " if error else "️✅ "
         self.status_bar.showMessage(prefix + msg, 3000)
     
     def _show_message(self, title, msg):
@@ -209,17 +212,17 @@ class SequenceTester(QMainWindow):
         
         input_layout.addWidget(QLabel("Индекс:"))
         self.ma_index_spin = QSpinBox()
-        self.ma_index_spin.setRange(0, 9999)
+        self.ma_index_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ma_index_spin)
         
         input_layout.addWidget(QLabel("Начало:"))
         self.ma_start_spin = QSpinBox()
-        self.ma_start_spin.setRange(0, 9999)
+        self.ma_start_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ma_start_spin)
         
         input_layout.addWidget(QLabel("Конец:"))
         self.ma_end_spin = QSpinBox()
-        self.ma_end_spin.setRange(0, 9999)
+        self.ma_end_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ma_end_spin)
         layout.addLayout(input_layout)
         
@@ -234,11 +237,13 @@ class SequenceTester(QMainWindow):
             ("GetSubsequence", self._ma_get_subseq),
             ("Concat", self._ma_concat),
             ("Clear", self._ma_clear),
+            ("Map", self._ma_map),
+            ("Reduce", self._ma_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
             btn = QPushButton(text)
             btn.clicked.connect(slot)
-            grid.addWidget(btn, i // 3, i % 3)
+            grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
     
     def _update_mutable_array_display(self):
@@ -347,6 +352,12 @@ class SequenceTester(QMainWindow):
         self._update_mutable_array_display()
         self._show_status("Последовательность очищена")
     
+    def _ma_map(self):
+        pass
+        
+    def _ma_reduce(self):
+        pass
+    
     def _setup_immutable_array_tab(self):
         tab = QWidget()
         self.tabs.addTab(tab, "ImmutableArraySequence")
@@ -367,7 +378,7 @@ class SequenceTester(QMainWindow):
         
         input_layout.addWidget(QLabel("Индекс:"))
         self.ia_index_spin = QSpinBox()
-        self.ia_index_spin.setRange(0, 9999)
+        self.ia_index_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ia_index_spin)
         layout.addLayout(input_layout)
         
@@ -382,11 +393,13 @@ class SequenceTester(QMainWindow):
             ("GetSubsequence", self._ia_get_subseq),
             ("Concat", self._ia_concat),
             ("Clear (новый объект)", self._ia_clear),
+            ("Map", self._ia_map), 
+            ("Reduce", self._ia_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
             btn = QPushButton(text)
             btn.clicked.connect(slot)
-            grid.addWidget(btn, i // 3, i % 3)
+            grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
     
     def _update_immutable_array_display(self):
@@ -497,6 +510,12 @@ class SequenceTester(QMainWindow):
         self.immutable_array_seq = ImmutableArraySequence()
         self._update_immutable_array_display()
         self._show_status("Создан новый пустой ImmutableArraySequence")
+        
+    def _ia_map(self):
+        pass
+
+    def _ia_reduce(self):
+        pass
     
     def _setup_mutable_list_tab(self):
         tab = QWidget()
@@ -517,19 +536,19 @@ class SequenceTester(QMainWindow):
         
         input_layout.addWidget(QLabel("Индекс:"))
         self.ml_index_spin = QSpinBox()
-        self.ml_index_spin.setRange(0, 9999)
+        self.ml_index_spin.setRange(0, MAX_INDEX)
         self.ml_index_spin.setValue(0)
         input_layout.addWidget(self.ml_index_spin)
         
         input_layout.addWidget(QLabel("Начало:"))
         self.ml_start_spin = QSpinBox()
-        self.ml_start_spin.setRange(0, 9999)
+        self.ml_start_spin.setRange(0, MAX_INDEX)
         self.ml_start_spin.setValue(0)
         input_layout.addWidget(self.ml_start_spin)
         
         input_layout.addWidget(QLabel("Конец:"))
         self.ml_end_spin = QSpinBox()
-        self.ml_end_spin.setRange(0, 9999)
+        self.ml_end_spin.setRange(0, MAX_INDEX)
         self.ml_end_spin.setValue(0)
         input_layout.addWidget(self.ml_end_spin)
         layout.addLayout(input_layout)
@@ -545,11 +564,13 @@ class SequenceTester(QMainWindow):
             ("GetSubsequence", self._ml_get_subseq),
             ("Concat", self._ml_concat),
             ("Clear", self._ml_clear),
+            ("Map", self._ml_map), 
+            ("Reduce", self._ml_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
             btn = QPushButton(text)
             btn.clicked.connect(slot)
-            grid.addWidget(btn, i // 3, i % 3)
+            grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
     
     def _update_mutable_list_display(self):
@@ -661,6 +682,12 @@ class SequenceTester(QMainWindow):
         self._update_mutable_list_display()
         self._show_status("Список очищен")
     
+    def _ml_map(self):
+        pass
+        
+    def _ml_reduce(self):
+        pass
+    
     def _setup_bit_tab(self):
         tab = QWidget()
         self.tabs.addTab(tab, "BitSequence")
@@ -681,17 +708,17 @@ class SequenceTester(QMainWindow):
         
         input_layout.addWidget(QLabel("Индекс:"))
         self.bit_index_spin = QSpinBox()
-        self.bit_index_spin.setRange(0, 9999)
+        self.bit_index_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.bit_index_spin)
         
         input_layout.addWidget(QLabel("Начало:"))
         self.bit_start_spin = QSpinBox()
-        self.bit_start_spin.setRange(0, 9999)
+        self.bit_start_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.bit_start_spin)
         
         input_layout.addWidget(QLabel("Конец:"))
         self.bit_end_spin = QSpinBox()
-        self.bit_end_spin.setRange(0, 9999)
+        self.bit_end_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.bit_end_spin)
         layout.addLayout(input_layout)
         
@@ -710,13 +737,92 @@ class SequenceTester(QMainWindow):
             ("NOT", self._bit_not),
             ("Concat", self._bit_concat),
             ("Clear", self._bit_clear),
+            ("Map", self._bit_map), 
+            ("Reduce", self._bit_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
             btn = QPushButton(text)
             btn.clicked.connect(slot)
             grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
-    
+    def _setup_vector_tab(self):
+        tab = QWidget()
+        self.tabs.addTab(tab, "Vector<int>")
+        layout = QVBoxLayout(tab)
+        
+        self.v_display = QTextEdit()
+        self.v_display.setReadOnly(True)
+        self.v_display.setFont(QFont("Courier", 11))
+        layout.addWidget(self.v_display)
+        
+        input_layout = QHBoxLayout()
+        
+        input_layout.addWidget(QLabel("Значение:"))
+        self.v_value_edit = QLineEdit()
+        self.v_value_edit.setPlaceholderText("0")
+        self.v_value_edit.setValidator(QIntValidator())
+        input_layout.addWidget(self.v_value_edit)
+        
+        input_layout.addWidget(QLabel("Индекс:"))
+        self.v_index_spin = QSpinBox()
+        self.v_index_spin.setRange(0, MAX_INDEX)
+        input_layout.addWidget(self.v_index_spin)
+        
+        input_layout.addWidget(QLabel("Скаляр:"))
+        self.v_scalar_edit = QLineEdit()
+        self.v_scalar_edit.setPlaceholderText("2")
+        self.v_scalar_edit.setValidator(QIntValidator())
+        input_layout.addWidget(self.v_scalar_edit)
+        
+        layout.addLayout(input_layout)
+        
+        self.v_second_display = QTextEdit()
+        self.v_second_display.setReadOnly(True)
+        self.v_second_display.setFont(QFont("Courier", 11))
+        self.v_second_display.setMaximumHeight(60)
+        layout.addWidget(QLabel("Второй вектор:"))
+        layout.addWidget(self.v_second_display)
+        
+        grid = QGridLayout()
+        btns = [
+            ("Get", self._v_get),
+            ("Set", self._v_set),
+            ("Clear", self._v_clear),
+            ("+ (Add)", self._v_add),
+            ("- (Sub)", self._v_sub),
+            ("* (Scalar)", self._v_mul),
+            ("Norm", self._v_norm),
+            ("Dot Product", self._v_dot),
+        ]
+        for i, (text, slot) in enumerate(btns):
+            btn = QPushButton(text)
+            btn.clicked.connect(slot)
+            grid.addWidget(btn, i // 4, i % 4)
+        layout.addLayout(grid)
+        
+        load_layout = QHBoxLayout()
+        load_layout.addWidget(QLabel("Загрузить вектор (через запятую):"))
+        self.v_load_edit = QLineEdit()
+        self.v_load_edit.setPlaceholderText("1,2,3,4,5")
+        load_layout.addWidget(self.v_load_edit)
+        btn_v_load = QPushButton("Загрузить")
+        btn_v_load.clicked.connect(self._v_load)
+        load_layout.addWidget(btn_v_load)
+        layout.addLayout(load_layout)
+
+        load_layout2 = QHBoxLayout()
+        load_layout2.addWidget(QLabel("Второй вектор (через запятую):"))
+        self.v_load_edit2 = QLineEdit()
+        self.v_load_edit2.setPlaceholderText("1,2,3")
+        load_layout2.addWidget(self.v_load_edit2)
+        btn_v_load2 = QPushButton("Загрузить")
+        btn_v_load2.clicked.connect(self._v_load2)
+        load_layout2.addWidget(btn_v_load2)
+        layout.addLayout(load_layout2)
+
+        btn_v_clear2 = QPushButton("Очистить второй вектор")
+        btn_v_clear2.clicked.connect(self._v_clear2)
+        layout.addWidget(btn_v_clear2)
     def _update_bit_display(self):
         text = "[ "
         for i in range(self.bit_seq.get_length()):
@@ -725,7 +831,119 @@ class SequenceTester(QMainWindow):
                 text += ", "
         text += f" ]\n\nДлина: {self.bit_seq.get_length()}"
         self.bit_display.setText(text)
-    
+    def _update_vector_display(self):
+        self.v_display.setText(self.v_seq.to_string())
+        self.v_second_display.setText(self.v_second_seq.to_string())
+    def _v_get(self):
+        idx = self.v_index_spin.value()
+        try:
+            val = self.v_seq.get(idx)
+            self._show_message("Get", f"Значение по индексу {idx}: {val}")
+            self._show_status(f"Get({idx}) = {val}")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_set(self):
+        if not self.v_value_edit.text():
+            self._show_status("Введите значение", True)
+            return
+        val = int(self.v_value_edit.text())
+        idx = self.v_index_spin.value()
+        try:
+            self.v_seq.set(idx, val)
+            self.v_value_edit.clear()
+            self._update_vector_display()
+            self._show_status(f"Set({idx}, {val}) выполнен")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_clear(self):
+        self.v_seq = VectorInt()
+        self.v_second_seq = VectorInt()
+        self._update_vector_display()
+        self._show_status("Векторы очищены")
+
+    def _v_add(self):
+        try:
+            result = self.v_seq.add(self.v_second_seq)
+            self._show_message("Add", f"Результат сложения:\n{result.to_string()}")
+            self._show_status("Сложение выполнено")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_sub(self):
+        try:
+            result = self.v_seq.sub(self.v_second_seq)
+            self._show_message("Sub", f"Результат вычитания:\n{result.to_string()}")
+            self._show_status("Вычитание выполнено")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_mul(self):
+        if not self.v_scalar_edit.text():
+            self._show_status("Введите скаляр", True)
+            return
+        scalar = int(self.v_scalar_edit.text())
+        try:
+            result = self.v_seq.mul(scalar)
+            self._show_message("Mul", f"Результат умножения на {scalar}:\n{result.to_string()}")
+            self._show_status(f"Умножение на {scalar} выполнено")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_norm(self):
+        try:
+            norm = self.v_seq.norm()
+            self._show_message("Norm", f"Норма вектора: {norm:.6f}")
+            self._show_status(f"Norm = {norm:.6f}")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_dot(self):
+        try:
+            result = self.v_seq.dot(self.v_second_seq)
+            self._show_message("Dot Product", f"Скалярное произведение: {result}")
+            self._show_status(f"Dot product = {result}")
+        except Exception as e:
+            self._show_status(str(e), True)
+    def _v_second_clear(self):
+        self.v_second_seq = VectorInt()
+        self._update_vector_display()
+        self._show_status("Второй вектор очищен")
+    def _v_load(self):
+        text = self.v_load_edit.text()
+        if not text:
+            self._show_status("Введите числа через запятую", True)
+            return
+        try:
+            values = [int(x.strip()) for x in text.split(",")]
+            self.v_seq = VectorInt(len(values))
+            for i, val in enumerate(values):
+                self.v_seq.set(i, val)
+            self._update_vector_display()
+            self._show_status(f"Загружен вектор: [{', '.join(map(str, values))}]")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_load2(self):
+        text = self.v_load_edit2.text()
+        if not text:
+            self._show_status("Введите числа через запятую", True)
+            return
+        try:
+            values = [int(x.strip()) for x in text.split(",")]
+            self.v_second_seq = VectorInt(len(values))
+            for i, val in enumerate(values):
+                self.v_second_seq.set(i, val)
+            self._update_vector_display()
+            self._show_status(f"Загружен второй вектор: [{', '.join(map(str, values))}]")
+        except Exception as e:
+            self._show_status(str(e), True)
+
+    def _v_clear2(self):
+        self.v_second_seq = VectorInt()
+        self._update_vector_display()
+        self._show_status("Второй вектор очищен")
     def _bit_append(self):
         if not self.bit_value_edit.text():
             self._show_status("Введите бит (0 или 1)", True)
@@ -887,6 +1105,12 @@ class SequenceTester(QMainWindow):
         self.bit_seq = BitSequence()
         self._update_bit_display()
         self._show_status("BitSequence очищена")
+        
+    def _bit_map(self):
+        pass
+        
+    def _bit_reduce(self):
+        pass
     
 def main():
     app = QApplication(sys.argv)

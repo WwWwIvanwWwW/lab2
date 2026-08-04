@@ -9,6 +9,8 @@ if(NOT MSVC)
 endif()
 
 include_directories(${CMAKE_SOURCE_DIR}/include)
+include_directories(${CMAKE_SOURCE_DIR}/include/Array)
+include_directories(${CMAKE_SOURCE_DIR}/include/List)
 
 add_library(sequence_lib SHARED
     src/Bit.cpp

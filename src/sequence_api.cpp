@@ -3,6 +3,7 @@
 #include "ImmutableListSequence.hpp"
 #include "MutableArraySequence.hpp"
 #include "MutableListSequence.hpp"
+#include "Vector.hpp"
 #include <stdexcept>
 
 extern "C" {
@@ -326,6 +327,153 @@ int BitSequence_clear(void **ptr)
 		return 1;
 	} catch (...) {
 		return 0;
+	}
+}
+
+void *VectorInt_new()
+{
+	try {
+		return new Vector<int>();
+	} catch (...) {
+		return nullptr;
+	}
+}
+
+int VectorInt_delete(void *ptr)
+{
+	if (ptr)
+		delete static_cast<Vector<int> *>(ptr);
+	return 1;
+}
+
+int VectorInt_getSize(void *ptr)
+{
+	try {
+		return static_cast<Vector<int> *>(ptr)->GetSize();
+	} catch (...) {
+		return 0;
+	}
+}
+
+int VectorInt_get(void *ptr, int index, int *error)
+{
+	try {
+		if (error)
+			*error = 0;
+		return static_cast<Vector<int> *>(ptr)->Get(index);
+	} catch (...) {
+		if (error)
+			*error = 1;
+		return 0;
+	}
+}
+
+int VectorInt_set(void *ptr, int index, int value)
+{
+	try {
+		static_cast<Vector<int> *>(ptr)->Set(index, value);
+		return 1;
+	} catch (...) {
+		return 0;
+	}
+}
+
+void *VectorInt_add(void *ptr, void *other, int *error)
+{
+	try {
+		if (error)
+			*error = 0;
+		Vector<int> result = (*static_cast<Vector<int> *>(ptr)) +
+							 (*static_cast<Vector<int> *>(other));
+		return new Vector<int>(result);
+	} catch (...) {
+		if (error)
+			*error = 1;
+		return nullptr;
+	}
+}
+
+void *VectorInt_sub(void *ptr, void *other, int *error)
+{
+	try {
+		if (error)
+			*error = 0;
+		Vector<int> result = (*static_cast<Vector<int> *>(ptr)) -
+							 (*static_cast<Vector<int> *>(other));
+		return new Vector<int>(result);
+	} catch (...) {
+		if (error)
+			*error = 1;
+		return nullptr;
+	}
+}
+
+void *VectorInt_mul(void *ptr, int scalar, int *error)
+{
+	try {
+		if (error)
+			*error = 0;
+		Vector<int> result = (*static_cast<Vector<int> *>(ptr)) * scalar;
+		return new Vector<int>(result);
+	} catch (...) {
+		if (error)
+			*error = 1;
+		return nullptr;
+	}
+}
+
+int VectorInt_norm(void *ptr, double *result)
+{
+	try {
+		*result = static_cast<Vector<int> *>(ptr)->Norm();
+		return 1;
+	} catch (...) {
+		return 0;
+	}
+}
+
+int VectorInt_dot(void *ptr, void *other, int *error)
+{
+	try {
+		if (error)
+			*error = 0;
+		return static_cast<Vector<int> *>(ptr)->ScalarProduct(
+			*static_cast<Vector<int> *>(other));
+	} catch (...) {
+		if (error)
+			*error = 1;
+		return 0;
+	}
+}
+
+const char *VectorInt_toString(void *ptr)
+{
+	try {
+		static std::string str;
+		str = static_cast<Vector<int> *>(ptr)->ToString();
+		return str.c_str();
+	} catch (...) {
+		return "[]";
+	}
+}
+
+int VectorInt_clear(void **ptr)
+{
+	try {
+		delete static_cast<Vector<int> *>(*ptr);
+		*ptr = new Vector<int>();
+		return 1;
+	} catch (...) {
+		return 0;
+	}
+}
+
+void *VectorInt_new_with_size(int size)
+{
+	try {
+		return new Vector<int>(size);
+	} catch (...) {
+		return nullptr;
 	}
 }
 }
