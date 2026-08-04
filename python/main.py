@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys
-from PySide6.QtWidgets import *
+import PySide6.QtWidgets
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont, QIntValidator, QRegularExpressionValidator
 from PySide6.QtCore import QRegularExpression
@@ -9,7 +9,7 @@ from sequence_wrapper import MutableArraySequence, ImmutableArraySequence, Mutab
 
 MAX_INDEX=9999
 
-class SequenceEditor(QDialog):
+class SequenceEditor(PySide6.QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Редактор последовательности")
@@ -17,28 +17,28 @@ class SequenceEditor(QDialog):
         
         self.seq = MutableArraySequence()
         
-        layout = QVBoxLayout(self)
+        layout = PySide6.QtWidgets.QVBoxLayout(self)
         
-        self.display = QTextEdit()
+        self.display = PySide6.QtWidgets.QTextEdit()
         self.display.setReadOnly(True)
         self.display.setFont(QFont("Courier", 11))
         layout.addWidget(self.display)
         
-        input_layout = QHBoxLayout()
-        self.value_edit = QLineEdit()
+        input_layout = PySide6.QtWidgets.QHBoxLayout()
+        self.value_edit = PySide6.QtWidgets.QLineEdit()
         self.value_edit.setPlaceholderText("Значение")
         self.value_edit.setValidator(QIntValidator())
-        self.index_spin = QSpinBox()
+        self.index_spin = PySide6.QtWidgets.QSpinBox()
         self.index_spin.setRange(0, MAX_INDEX)
-        btn_append = QPushButton("Append")
-        btn_clear = QPushButton("Clear")
+        btn_append = PySide6.QtWidgets.QPushButton("Append")
+        btn_clear = PySide6.QtWidgets.QPushButton("Clear")
         input_layout.addWidget(self.value_edit)
         input_layout.addWidget(self.index_spin)
         input_layout.addWidget(btn_append)
         input_layout.addWidget(btn_clear)
         layout.addLayout(input_layout)
         
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons = PySide6.QtWidgets.QDialogButtonBox(PySide6.QtWidgets.QDialogButtonBox.StandardButton.Ok | PySide6.QtWidgets.QDialogButtonBox.StandardButton.Cancel)
         layout.addWidget(buttons)
         
         btn_append.clicked.connect(self._on_append)
@@ -72,7 +72,7 @@ class SequenceEditor(QDialog):
         return self.seq
 
 
-class BitSequenceEditor(QDialog):
+class BitSequenceEditor(PySide6.QtWidgets.QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Редактор BitSequence")
@@ -80,28 +80,28 @@ class BitSequenceEditor(QDialog):
         
         self.seq = BitSequence()
         
-        layout = QVBoxLayout(self)
+        layout = PySide6.QtWidgets.QVBoxLayout(self)
         
-        self.display = QTextEdit()
+        self.display = PySide6.QtWidgets.QTextEdit()
         self.display.setReadOnly(True)
         self.display.setFont(QFont("Courier", 11))
         layout.addWidget(self.display)
         
-        input_layout = QHBoxLayout()
-        self.bit_edit = QLineEdit()
+        input_layout = PySide6.QtWidgets.QHBoxLayout()
+        self.bit_edit = PySide6.QtWidgets.QLineEdit()
         self.bit_edit.setPlaceholderText("Бит (0/1)")
         self.bit_edit.setValidator(QRegularExpressionValidator(QRegularExpression("[01]")))
-        self.index_spin = QSpinBox()
+        self.index_spin = PySide6.QtWidgets.QSpinBox()
         self.index_spin.setRange(0, MAX_INDEX)
-        btn_append = QPushButton("Append")
-        btn_clear = QPushButton("Clear")
+        btn_append = PySide6.QtWidgets.QPushButton("Append")
+        btn_clear = PySide6.QtWidgets.QPushButton("Clear")
         input_layout.addWidget(self.bit_edit)
         input_layout.addWidget(self.index_spin)
         input_layout.addWidget(btn_append)
         input_layout.addWidget(btn_clear)
         layout.addLayout(input_layout)
         
-        buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
+        buttons = PySide6.QtWidgets.QDialogButtonBox(PySide6.QtWidgets.QDialogButtonBox.StandardButton.Ok | PySide6.QtWidgets.QDialogButtonBox.StandardButton.Cancel)
         layout.addWidget(buttons)
         
         btn_append.clicked.connect(self._on_append)
@@ -135,7 +135,7 @@ class BitSequenceEditor(QDialog):
         return self.seq
 
 
-class SequenceTester(QMainWindow):
+class SequenceTester(PySide6.QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Sequence Tester")
@@ -157,11 +157,11 @@ class SequenceTester(QMainWindow):
 
     
     def _setup_ui(self):
-        central = QWidget()
+        central = PySide6.QtWidgets.QWidget()
         self.setCentralWidget(central)
-        layout = QVBoxLayout(central)
+        layout = PySide6.QtWidgets.QVBoxLayout(central)
                 
-        self.tabs = QTabWidget()
+        self.tabs = PySide6.QtWidgets.QTabWidget()
         layout.addWidget(self.tabs)
         
         self._setup_mutable_array_tab()
@@ -170,7 +170,7 @@ class SequenceTester(QMainWindow):
         self._setup_bit_tab()
         self._setup_vector_tab()
         
-        self.status_bar = QStatusBar()
+        self.status_bar = PySide6.QtWidgets.QStatusBar()
         self.setStatusBar(self.status_bar)
         self.status_bar.showMessage("Готов")
     
@@ -179,54 +179,54 @@ class SequenceTester(QMainWindow):
         self.status_bar.showMessage(prefix + msg, 3000)
     
     def _show_message(self, title, msg):
-        QMessageBox.information(self, title, msg)
+        PySide6.QtWidgets.QMessageBox.information(self, title, msg)
     
     def _get_second_int_sequence(self):
         dialog = SequenceEditor(self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
+        if dialog.exec() == PySide6.QtWidgets.QDialog.DialogCode.Accepted:
             return dialog.get_sequence()
         return None
     
     def _get_second_bit_sequence(self):
         dialog = BitSequenceEditor(self)
-        if dialog.exec() == QDialog.DialogCode.Accepted:
+        if dialog.exec() == PySide6.QtWidgets.QDialog.DialogCode.Accepted:
             return dialog.get_sequence()
         return None
     
     def _setup_mutable_array_tab(self):
-        tab = QWidget()
+        tab = PySide6.QtWidgets.QWidget()
         self.tabs.addTab(tab, "MutableArraySequence")
-        layout = QVBoxLayout(tab)
+        layout = PySide6.QtWidgets.QVBoxLayout(tab)
         
-        self.ma_display = QTextEdit()
+        self.ma_display = PySide6.QtWidgets.QTextEdit()
         self.ma_display.setReadOnly(True)
         self.ma_display.setFont(QFont("Courier", 11))
         layout.addWidget(self.ma_display)
         
-        input_layout = QHBoxLayout()
-        input_layout.addWidget(QLabel("Значение:"))
-        self.ma_value_edit = QLineEdit()
+        input_layout = PySide6.QtWidgets.QHBoxLayout()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Значение:"))
+        self.ma_value_edit = PySide6.QtWidgets.QLineEdit()
         self.ma_value_edit.setPlaceholderText("0")
         self.ma_value_edit.setValidator(QIntValidator())
         input_layout.addWidget(self.ma_value_edit)
         
-        input_layout.addWidget(QLabel("Индекс:"))
-        self.ma_index_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Индекс:"))
+        self.ma_index_spin = PySide6.QtWidgets.QSpinBox()
         self.ma_index_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ma_index_spin)
         
-        input_layout.addWidget(QLabel("Начало:"))
-        self.ma_start_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Начало:"))
+        self.ma_start_spin = PySide6.QtWidgets.QSpinBox()
         self.ma_start_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ma_start_spin)
         
-        input_layout.addWidget(QLabel("Конец:"))
-        self.ma_end_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Конец:"))
+        self.ma_end_spin = PySide6.QtWidgets.QSpinBox()
         self.ma_end_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ma_end_spin)
         layout.addLayout(input_layout)
         
-        grid = QGridLayout()
+        grid = PySide6.QtWidgets.QGridLayout()
         btns = [
             ("Append", self._ma_append),
             ("Prepend", self._ma_prepend),
@@ -241,7 +241,7 @@ class SequenceTester(QMainWindow):
             ("Reduce", self._ma_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
-            btn = QPushButton(text)
+            btn = PySide6.QtWidgets.QPushButton(text)
             btn.clicked.connect(slot)
             grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
@@ -359,30 +359,30 @@ class SequenceTester(QMainWindow):
         pass
     
     def _setup_immutable_array_tab(self):
-        tab = QWidget()
+        tab = PySide6.QtWidgets.QWidget()
         self.tabs.addTab(tab, "ImmutableArraySequence")
-        layout = QVBoxLayout(tab)
+        layout = PySide6.QtWidgets.QVBoxLayout(tab)
         
-        self.ia_display = QTextEdit()
+        self.ia_display = PySide6.QtWidgets.QTextEdit()
         self.ia_display.setReadOnly(True)
         self.ia_display.setFont(QFont("Courier", 11))
         layout.addWidget(self.ia_display)
         
-        input_layout = QHBoxLayout()
+        input_layout = PySide6.QtWidgets.QHBoxLayout()
         
-        input_layout.addWidget(QLabel("Значение:"))
-        self.ia_value_edit = QLineEdit()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Значение:"))
+        self.ia_value_edit = PySide6.QtWidgets.QLineEdit()
         self.ia_value_edit.setPlaceholderText("0")
         self.ia_value_edit.setValidator(QIntValidator())
         input_layout.addWidget(self.ia_value_edit)
         
-        input_layout.addWidget(QLabel("Индекс:"))
-        self.ia_index_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Индекс:"))
+        self.ia_index_spin = PySide6.QtWidgets.QSpinBox()
         self.ia_index_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.ia_index_spin)
         layout.addLayout(input_layout)
         
-        grid = QGridLayout()
+        grid = PySide6.QtWidgets.QGridLayout()
         btns = [
             ("Append (копия)", self._ia_append),
             ("Prepend (копия)", self._ia_prepend),
@@ -397,7 +397,7 @@ class SequenceTester(QMainWindow):
             ("Reduce", self._ia_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
-            btn = QPushButton(text)
+            btn = PySide6.QtWidgets.QPushButton(text)
             btn.clicked.connect(slot)
             grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
@@ -518,42 +518,42 @@ class SequenceTester(QMainWindow):
         pass
     
     def _setup_mutable_list_tab(self):
-        tab = QWidget()
+        tab = PySide6.QtWidgets.QWidget()
         self.tabs.addTab(tab, "MutableListSequence")
-        layout = QVBoxLayout(tab)
+        layout = PySide6.QtWidgets.QVBoxLayout(tab)
         
-        self.ml_display = QTextEdit()
+        self.ml_display = PySide6.QtWidgets.QTextEdit()
         self.ml_display.setReadOnly(True)
         self.ml_display.setFont(QFont("Courier", 11))
         layout.addWidget(self.ml_display)
         
-        input_layout = QHBoxLayout()
-        input_layout.addWidget(QLabel("Значение:"))
-        self.ml_value_edit = QLineEdit()
+        input_layout = PySide6.QtWidgets.QHBoxLayout()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Значение:"))
+        self.ml_value_edit = PySide6.QtWidgets.QLineEdit()
         self.ml_value_edit.setPlaceholderText("0")
         self.ml_value_edit.setValidator(QIntValidator())
         input_layout.addWidget(self.ml_value_edit)
         
-        input_layout.addWidget(QLabel("Индекс:"))
-        self.ml_index_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Индекс:"))
+        self.ml_index_spin = PySide6.QtWidgets.QSpinBox()
         self.ml_index_spin.setRange(0, MAX_INDEX)
         self.ml_index_spin.setValue(0)
         input_layout.addWidget(self.ml_index_spin)
         
-        input_layout.addWidget(QLabel("Начало:"))
-        self.ml_start_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Начало:"))
+        self.ml_start_spin = PySide6.QtWidgets.QSpinBox()
         self.ml_start_spin.setRange(0, MAX_INDEX)
         self.ml_start_spin.setValue(0)
         input_layout.addWidget(self.ml_start_spin)
         
-        input_layout.addWidget(QLabel("Конец:"))
-        self.ml_end_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Конец:"))
+        self.ml_end_spin = PySide6.QtWidgets.QSpinBox()
         self.ml_end_spin.setRange(0, MAX_INDEX)
         self.ml_end_spin.setValue(0)
         input_layout.addWidget(self.ml_end_spin)
         layout.addLayout(input_layout)
         
-        grid = QGridLayout()
+        grid = PySide6.QtWidgets.QGridLayout()
         btns = [
             ("Append", self._ml_append),
             ("Prepend", self._ml_prepend),
@@ -568,7 +568,7 @@ class SequenceTester(QMainWindow):
             ("Reduce", self._ml_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
-            btn = QPushButton(text)
+            btn = PySide6.QtWidgets.QPushButton(text)
             btn.clicked.connect(slot)
             grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
@@ -689,40 +689,40 @@ class SequenceTester(QMainWindow):
         pass
     
     def _setup_bit_tab(self):
-        tab = QWidget()
+        tab = PySide6.QtWidgets.QWidget()
         self.tabs.addTab(tab, "BitSequence")
-        layout = QVBoxLayout(tab)
+        layout = PySide6.QtWidgets.QVBoxLayout(tab)
         
-        self.bit_display = QTextEdit()
+        self.bit_display = PySide6.QtWidgets.QTextEdit()
         self.bit_display.setReadOnly(True)
         self.bit_display.setFont(QFont("Courier", 11))
         layout.addWidget(self.bit_display)
         
-        input_layout = QHBoxLayout()
+        input_layout = PySide6.QtWidgets.QHBoxLayout()
         
-        input_layout.addWidget(QLabel("Бит (0/1):"))
-        self.bit_value_edit = QLineEdit()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Бит (0/1):"))
+        self.bit_value_edit = PySide6.QtWidgets.QLineEdit()
         self.bit_value_edit.setPlaceholderText("0")
         self.bit_value_edit.setValidator(QRegularExpressionValidator(QRegularExpression("[01]")))
         input_layout.addWidget(self.bit_value_edit)
         
-        input_layout.addWidget(QLabel("Индекс:"))
-        self.bit_index_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Индекс:"))
+        self.bit_index_spin = PySide6.QtWidgets.QSpinBox()
         self.bit_index_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.bit_index_spin)
         
-        input_layout.addWidget(QLabel("Начало:"))
-        self.bit_start_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Начало:"))
+        self.bit_start_spin = PySide6.QtWidgets.QSpinBox()
         self.bit_start_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.bit_start_spin)
         
-        input_layout.addWidget(QLabel("Конец:"))
-        self.bit_end_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Конец:"))
+        self.bit_end_spin = PySide6.QtWidgets.QSpinBox()
         self.bit_end_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.bit_end_spin)
         layout.addLayout(input_layout)
         
-        grid = QGridLayout()
+        grid = PySide6.QtWidgets.QGridLayout()
         btns = [
             ("Append", self._bit_append),
             ("Prepend", self._bit_prepend),
@@ -741,49 +741,49 @@ class SequenceTester(QMainWindow):
             ("Reduce", self._bit_reduce)
         ]
         for i, (text, slot) in enumerate(btns):
-            btn = QPushButton(text)
+            btn = PySide6.QtWidgets.QPushButton(text)
             btn.clicked.connect(slot)
             grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
     def _setup_vector_tab(self):
-        tab = QWidget()
+        tab = PySide6.QtWidgets.QWidget()
         self.tabs.addTab(tab, "Vector<int>")
-        layout = QVBoxLayout(tab)
+        layout = PySide6.QtWidgets.QVBoxLayout(tab)
         
-        self.v_display = QTextEdit()
+        self.v_display = PySide6.QtWidgets.QTextEdit()
         self.v_display.setReadOnly(True)
         self.v_display.setFont(QFont("Courier", 11))
         layout.addWidget(self.v_display)
         
-        input_layout = QHBoxLayout()
+        input_layout = PySide6.QtWidgets.QHBoxLayout()
         
-        input_layout.addWidget(QLabel("Значение:"))
-        self.v_value_edit = QLineEdit()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Значение:"))
+        self.v_value_edit = PySide6.QtWidgets.QLineEdit()
         self.v_value_edit.setPlaceholderText("0")
         self.v_value_edit.setValidator(QIntValidator())
         input_layout.addWidget(self.v_value_edit)
         
-        input_layout.addWidget(QLabel("Индекс:"))
-        self.v_index_spin = QSpinBox()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Индекс:"))
+        self.v_index_spin = PySide6.QtWidgets.QSpinBox()
         self.v_index_spin.setRange(0, MAX_INDEX)
         input_layout.addWidget(self.v_index_spin)
         
-        input_layout.addWidget(QLabel("Скаляр:"))
-        self.v_scalar_edit = QLineEdit()
+        input_layout.addWidget(PySide6.QtWidgets.QLabel("Скаляр:"))
+        self.v_scalar_edit = PySide6.QtWidgets.QLineEdit()
         self.v_scalar_edit.setPlaceholderText("2")
         self.v_scalar_edit.setValidator(QIntValidator())
         input_layout.addWidget(self.v_scalar_edit)
         
         layout.addLayout(input_layout)
         
-        self.v_second_display = QTextEdit()
+        self.v_second_display = PySide6.QtWidgets.QTextEdit()
         self.v_second_display.setReadOnly(True)
         self.v_second_display.setFont(QFont("Courier", 11))
         self.v_second_display.setMaximumHeight(60)
-        layout.addWidget(QLabel("Второй вектор:"))
+        layout.addWidget(PySide6.QtWidgets.QLabel("Второй вектор:"))
         layout.addWidget(self.v_second_display)
         
-        grid = QGridLayout()
+        grid = PySide6.QtWidgets.QGridLayout()
         btns = [
             ("Get", self._v_get),
             ("Set", self._v_set),
@@ -795,32 +795,32 @@ class SequenceTester(QMainWindow):
             ("Dot Product", self._v_dot),
         ]
         for i, (text, slot) in enumerate(btns):
-            btn = QPushButton(text)
+            btn = PySide6.QtWidgets.QPushButton(text)
             btn.clicked.connect(slot)
             grid.addWidget(btn, i // 4, i % 4)
         layout.addLayout(grid)
         
-        load_layout = QHBoxLayout()
-        load_layout.addWidget(QLabel("Загрузить вектор (через запятую):"))
-        self.v_load_edit = QLineEdit()
+        load_layout = PySide6.QtWidgets.QHBoxLayout()
+        load_layout.addWidget(PySide6.QtWidgets.QLabel("Загрузить вектор (через запятую):"))
+        self.v_load_edit = PySide6.QtWidgets.QLineEdit()
         self.v_load_edit.setPlaceholderText("1,2,3,4,5")
         load_layout.addWidget(self.v_load_edit)
-        btn_v_load = QPushButton("Загрузить")
+        btn_v_load = PySide6.QtWidgets.QPushButton("Загрузить")
         btn_v_load.clicked.connect(self._v_load)
         load_layout.addWidget(btn_v_load)
         layout.addLayout(load_layout)
 
-        load_layout2 = QHBoxLayout()
-        load_layout2.addWidget(QLabel("Второй вектор (через запятую):"))
-        self.v_load_edit2 = QLineEdit()
+        load_layout2 = PySide6.QtWidgets.QHBoxLayout()
+        load_layout2.addWidget(PySide6.QtWidgets.QLabel("Второй вектор (через запятую):"))
+        self.v_load_edit2 = PySide6.QtWidgets.QLineEdit()
         self.v_load_edit2.setPlaceholderText("1,2,3")
         load_layout2.addWidget(self.v_load_edit2)
-        btn_v_load2 = QPushButton("Загрузить")
+        btn_v_load2 = PySide6.QtWidgets.QPushButton("Загрузить")
         btn_v_load2.clicked.connect(self._v_load2)
         load_layout2.addWidget(btn_v_load2)
         layout.addLayout(load_layout2)
 
-        btn_v_clear2 = QPushButton("Очистить второй вектор")
+        btn_v_clear2 = PySide6.QtWidgets.QPushButton("Очистить второй вектор")
         btn_v_clear2.clicked.connect(self._v_clear2)
         layout.addWidget(btn_v_clear2)
     def _update_bit_display(self):
@@ -1113,7 +1113,7 @@ class SequenceTester(QMainWindow):
         pass
     
 def main():
-    app = QApplication(sys.argv)
+    app = PySide6.QtWidgets.QApplication(sys.argv)
     window = SequenceTester()
     window.show()
     sys.exit(app.exec())
