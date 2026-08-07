@@ -83,6 +83,13 @@ TEST(MutableArraySequenceTest, GetFirst)
 	EXPECT_EQ(seq.GetFirst(), 10);
 }
 
+TEST(MutableArraySequenceTest, GetFirstSingleElement)
+{
+	MutableArraySequence<int> seq;
+	seq.Append(42);
+	EXPECT_EQ(seq.GetFirst(), 42);
+}
+
 TEST(MutableArraySequenceTest, GetFirstOnEmpty)
 {
 	MutableArraySequence<int> seq;
@@ -94,6 +101,13 @@ TEST(MutableArraySequenceTest, GetLast)
 	int items[] = {10, 20, 30};
 	MutableArraySequence<int> seq(items, 3);
 	EXPECT_EQ(seq.GetLast(), 30);
+}
+
+TEST(MutableArraySequenceTest, GetLastSingleElement)
+{
+	MutableArraySequence<int> seq;
+	seq.Append(42);
+	EXPECT_EQ(seq.GetLast(), 42);
 }
 
 TEST(MutableArraySequenceTest, GetLastOnEmpty)
@@ -203,4 +217,42 @@ TEST(MutableArraySequenceTest, ConcatWithEmpty)
 	MutableArraySequence<int> seq2;
 	auto result = seq1.Concat(&seq2);
 	EXPECT_MUTABLE_SEQ((*result), 1, 2, 3);
+}
+
+TEST(MutableArraySequenceTest, ConcatBothEmpty)
+{
+	MutableArraySequence<int> seq1;
+	MutableArraySequence<int> seq2;
+	auto result = seq1.Concat(&seq2);
+	EXPECT_EQ(result->GetLength(), 0);
+}
+
+TEST(MutableArraySequenceTest, Map)
+{
+	int items[] = {1, 2, 3, 4, 5};
+	MutableArraySequence<int> seq1(items, 5);
+	auto result = seq1.Map([](int x) { return x * 2; });
+	EXPECT_MUTABLE_SEQ(*result, 2, 4, 6, 8, 10);
+}
+
+TEST(MutableArraySequenceTest, MapWithEmpty)
+{
+	MutableArraySequence<int> seq1;
+	auto result = seq1.Map([](int x) { return x * 2; });
+	EXPECT_EQ(result->GetLength(), 0);
+}
+
+TEST(MutableArraySequenceTest, Reduce)
+{
+	int items[] = {1, 2, 3, 4, 5};
+	MutableArraySequence<int> seq1(items, 5);
+	auto result = seq1.Reduce([](int x, int acc) { return x + acc; }, 0);
+	EXPECT_EQ(result, 15);
+}
+
+TEST(MutableArraySequenceTest, ReduceWithEmpty)
+{
+	MutableArraySequence<int> seq1;
+	auto result = seq1.Reduce([](int x, int acc) { return x + acc; }, 0);
+	EXPECT_EQ(result, 0);
 }

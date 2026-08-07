@@ -96,6 +96,12 @@ TEST(MutableListSequenceTest, GetSubsequence)
 	EXPECT_MUTABLE_LIST((*sub), 2, 3, 4);
 }
 
+TEST(MutableListSequenceTest, GetSubsequenceWithEmpty)
+{
+	MutableListSequence<int> seq;
+	EXPECT_MUTABLE_LIST_THROW(seq.GetSubsequence(0, 0), std::out_of_range);
+}
+
 TEST(MutableListSequenceTest, Concat)
 {
 	int items1[] = {1, 2};
