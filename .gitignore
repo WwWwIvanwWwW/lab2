@@ -1,6 +1,6 @@
 build/
-CMakeLists.txt
 *.o
+*.user
 LAB_2
 .vscode/
 libs/
