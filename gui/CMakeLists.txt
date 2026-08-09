@@ -12,6 +12,12 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools)
 
+include_directories(
+    ${CMAKE_SOURCE_DIR}/../include
+    ${CMAKE_SOURCE_DIR}/../include/Array
+    ${CMAKE_SOURCE_DIR}/../include/List
+)
+
 set(TS_FILES gui_ru_RU.ts)
 
 set(PROJECT_SOURCES
@@ -20,6 +26,8 @@ set(PROJECT_SOURCES
         mainwindow.h
         mainwindow.ui
         ${TS_FILES}
+        ${CMAKE_SOURCE_DIR}/../src/BitSequence.cpp
+        ${CMAKE_SOURCE_DIR}/../src/Bit.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)

@@ -6,3 +6,4 @@ LAB_2
 libs/
 pyside_env/
 __pycache__
+*.cache
