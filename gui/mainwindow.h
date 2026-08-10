@@ -7,6 +7,7 @@
 #include "MutableArraySequence.hpp"
 #include "MutableListSequence.hpp"
 #include "Vector.hpp"
+#include <QInputDialog>
 #include <QMainWindow>
 
 QT_BEGIN_NAMESPACE
@@ -48,6 +49,9 @@ class MainWindow : public QMainWindow
 	BitSequence bitSeq;
 	Vector<int> vectorSeq;
 
+	QString MatoQString(Sequence<int> *maSeq);
 	void updateDisplay();
+	QString InputSequence();
+	MutableArraySequence<int> QStringtoMa(QString text);
 };
 #endif // MAINWINDOW_H
