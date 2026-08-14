@@ -41,10 +41,9 @@ template <class T> class Vector
 	bool operator==(const Vector<T> &other) const;
 	bool operator!=(const Vector<T> &other) const;
 
-	T Norm() const;
+	double Norm(int accuracy = 4) const;
 	T ScalarProduct(const Vector<T> &other) const;
 
-	std::unique_ptr<Sequence<T>> ToSequence() const;
 	std::string ToString() const;
 };
 

@@ -34,3 +34,4 @@ add_test_with_sources(test_ImmutableArraySequence tests/test_ImmutableArraySeque
 add_test_with_sources(test_MutableListSequence tests/test_MutableListSequence.cpp)
 add_test_with_sources(test_ImmutableListSequence tests/test_ImmutableListSequence.cpp)
 add_test_with_sources(test_BitSequence tests/test_BitSequence.cpp src/Bit.cpp src/BitSequence.cpp)
+add_test_with_sources(test_Vector tests/test_Vector.cpp)

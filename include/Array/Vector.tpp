@@ -37,7 +37,8 @@ Vector<T>::Vector(const Sequence<T> &seq)
 
 template <class T>
 Vector<T>::Vector(const Vector<T> &other)
-	: m_data(std::make_unique<DynamicArray<T>>()), m_size(other.m_size)
+	: m_data(std::make_unique<DynamicArray<T>>(other.m_size)),
+	  m_size(other.m_size)
 {
 	for (int i = 0; i < m_size; ++i) {
 		m_data->Set(i, other.m_data->Get(i));
@@ -173,14 +174,16 @@ template <class T> bool Vector<T>::operator!=(const Vector<T> &other) const
 	return !(*this == other);
 }
 
-template <class T> T Vector<T>::Norm() const
+template <class T> double Vector<T>::Norm(int accuracy) const
 {
-	T sum = 0;
+	double sum = 0.0;
 	for (int i = 0; i < m_size; ++i) {
 		T val = m_data->Get(i);
 		sum += val * val;
 	}
-	return std::sqrt(sum);
+	sum = (std::round(std::sqrt(sum) * (std::pow(10.0, accuracy)) + 1e-12)) /
+		  (std::pow(10.0, accuracy));
+	return sum;
 }
 
 template <class T> T Vector<T>::ScalarProduct(const Vector<T> &other) const
@@ -191,15 +194,6 @@ template <class T> T Vector<T>::ScalarProduct(const Vector<T> &other) const
 		result += m_data->Get(i) * other.m_data->Get(i);
 	}
 	return result;
-}
-
-template <class T> std::unique_ptr<Sequence<T>> Vector<T>::ToSequence() const
-{
-	auto seq = std::make_unique<MutableArraySequence<T>>();
-	for (int i = 0; i < m_size; ++i) {
-		seq->Append(m_data->Get(i));
-	}
-	return seq;
 }
 
 template <class T> std::string Vector<T>::ToString() const
