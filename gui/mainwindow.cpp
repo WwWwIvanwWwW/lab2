@@ -1,7 +1,5 @@
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
-
-#define SHOWSTATUSBARTIME 2000
+#include "ui_mainwindow.h"
 
 // onMaAppend<-onMutableArrayAppend...
 
@@ -33,32 +31,11 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow() { delete ui; }
 
-QString MainWindow::MatoQString(Sequence<int> *maSeq)
-{
-	QString text = "[ ";
-	for (int i = 0; i < maSeq->GetLength(); ++i) {
-		text += QString::number(maSeq->Get(i));
-		if (i + 1 < maSeq->GetLength()) {
-			text += ", ";
-		}
-	}
-	text += " ]";
-	return text;
-}
-
-void MainWindow::updateDisplay()
-{
-	QString text = MatoQString(&maSeq);
-	text += "\n\nДлина: " + QString::number(maSeq.GetLength());
-
-	ui->textEdit->setText(text);
-}
-
 QString MainWindow::InputSequence()
 {
 	bool ok;
 	QString text = QInputDialog::getText(
-		this, "Ввод новоmavalueдовательности",
+		this, "Ввод новоq mavalueдовательности",
 		"Введите последовательность через запятую", QLineEdit::Normal, "", &ok);
 
 	if (!ok) {
@@ -84,135 +61,31 @@ MutableArraySequence<int> MainWindow::QStringtoMa(QString text)
 };
 
 // buttons
-void MainWindow::onMaAppend()
-{
-	try {
-		int value = ui->mavalue->value();
-		maSeq.Append(value);
-
-		updateDisplay();
-		ui->statusbar->showMessage(QString("️✅ Append: %1").arg(value),
-								   SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
-}
-
+void MainWindow::onMaAppend() { SAppend(&maSeq, ui->mavalue, ui->matextEdit); }
 void MainWindow::onMaPrepend()
 {
-	try {
-		int value = ui->mavalue->value();
-		maSeq.Prepend(value);
-
-		updateDisplay();
-		ui->statusbar->showMessage(QString("️✅ Prepend: %1").arg(value),
-								   SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
+	SPrepend(&maSeq, ui->mavalue, ui->matextEdit);
 }
-
 void MainWindow::onMaInsertAt()
 {
-	try {
-		int index = ui->maindex->value();
-		int value = ui->mavalue->value();
-		maSeq.InsertAt(value, index);
-
-		updateDisplay();
-		ui->statusbar->showMessage(
-			QString("️✅ InsertAt: %1, index: %2").arg(value).arg(index),
-			SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
+	SInsertAt(&maSeq, ui->mavalue, ui->matextEdit);
 }
-
-void MainWindow::onMaGet()
-{
-	try {
-		int index = ui->maindex->value();
-		int value = maSeq.Get(index);
-
-		updateDisplay();
-		ui->statusbar->showMessage(QString("️✅ Get: %1").arg(value),
-								   SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
-}
-
+void MainWindow::onMaGet() { SGet(&maSeq, ui->mavalue, ui->matextEdit); }
 void MainWindow::onMaGetFirst()
 {
-	try {
-		int value = maSeq.GetFirst();
-
-		updateDisplay();
-		ui->statusbar->showMessage(QString("️✅ GetFirst: %1").arg(value),
-								   SHOWSTATUSBARTIME);
-	} catch (const std::out_of_range &e) {
-		ui->statusbar->showMessage("❌ Ошибка: последовательность пуста",
-								   SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
+	SGetFirst(&maSeq, ui->mavalue, ui->matextEdit);
 }
-
 void MainWindow::onMaGetLast()
 {
-	try {
-		int value = maSeq.GetLast();
-
-		updateDisplay();
-		ui->statusbar->showMessage(QString("️✅ GetLast: %1").arg(value),
-								   SHOWSTATUSBARTIME);
-	} catch (const std::out_of_range &e) {
-		ui->statusbar->showMessage("❌ Ошибка: последовательность пуста",
-								   SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
+	SGetLast(&maSeq, ui->mavalue, ui->matextEdit);
 }
-
 void MainWindow::onMaGetSubsequence()
 {
-	try {
-		int index = ui->maindex->value();
-		int index2 = ui->maindex2->value();
-		int value = ui->mavalue->value();
-		auto maSeq1 = maSeq.GetSubsequence(index, index2);
-
-		updateDisplay();
-		ui->statusbar->showMessage(
-			QString("️✅ GetSubsequence: %1").arg(MatoQString(maSeq1.get())),
-			SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
+	SGetSubsequence(&maSeq, ui->mavalue, ui->matextEdit);
 }
-
 void MainWindow::onMaGetLength()
 {
-	try {
-		int value = maSeq.GetLength();
-
-		updateDisplay();
-		ui->statusbar->showMessage(QString("️✅ GetLength: %1").arg(value),
-								   SHOWSTATUSBARTIME);
-	} catch (const std::out_of_range &e) {
-		ui->statusbar->showMessage("❌ Ошибка: последовательность пуста",
-								   SHOWSTATUSBARTIME);
-	} catch (const std::exception &e) {
-		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
-								   SHOWSTATUSBARTIME);
-	}
+	SGetLength(&maSeq, ui->mavalue, ui->matextEdit);
 }
 
 void MainWindow::onMaConcat() {}
@@ -225,11 +98,75 @@ void MainWindow::onMaClear()
 {
 	try {
 		maSeq = MutableArraySequence<int>();
-
-		updateDisplay();
-		ui->statusbar->showMessage(QString("️✅ Clear"), SHOWSTATUSBARTIME);
+		updateDisplay(&maSeq, ui->matextEdit);
+		ui->statusbar->showMessage("✅ Clear", SHOWSTATUSBARTIME);
 	} catch (const std::exception &e) {
 		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
 								   SHOWSTATUSBARTIME);
 	}
 }
+
+void MainWindow::onIaAppend() {}
+void MainWindow::onIaPrepend() {}
+void MainWindow::onIaInsertAt() {}
+void MainWindow::onIaGet() {}
+void MainWindow::onIaGetFirst() {}
+void MainWindow::onIaGetLast() {}
+void MainWindow::onIaGetSubsequence() {}
+void MainWindow::onIaGetLength() {}
+void MainWindow::onIaConcat() {}
+void MainWindow::onIaMap() {}
+void MainWindow::onIaReduce() {}
+void MainWindow::onIaClear() {}
+
+void MainWindow::onMlAppend() {}
+void MainWindow::onMlPrepend() {}
+void MainWindow::onMlInsertAt() {}
+void MainWindow::onMlGet() {}
+void MainWindow::onMlGetFirst() {}
+void MainWindow::onMlGetLast() {}
+void MainWindow::onMlGetSubsequence() {}
+void MainWindow::onMlGetLength() {}
+void MainWindow::onMlConcat() {}
+void MainWindow::onMlMap() {}
+void MainWindow::onMlReduce() {}
+void MainWindow::onMlClear() {}
+
+void MainWindow::onIlAppend() {}
+void MainWindow::onIlPrepend() {}
+void MainWindow::onIlInsertAt() {}
+void MainWindow::onIlGet() {}
+void MainWindow::onIlGetFirst() {}
+void MainWindow::onIlGetLast() {}
+void MainWindow::onIlGetSubsequence() {}
+void MainWindow::onIlGetLength() {}
+void MainWindow::onIlConcat() {}
+void MainWindow::onIlMap() {}
+void MainWindow::onIlReduce() {}
+void MainWindow::onIlClear() {}
+
+void MainWindow::onBAppend() {}
+void MainWindow::onBPrepend() {}
+void MainWindow::onBInsertAt() {}
+void MainWindow::onBGet() {}
+void MainWindow::onBGetFirst() {}
+void MainWindow::onBGetLast() {}
+void MainWindow::onBGetSubsequence() {}
+void MainWindow::onBGetLength() {}
+void MainWindow::onBConcat() {}
+void MainWindow::onBMap() {}
+void MainWindow::onBReduce() {}
+void MainWindow::onBClear() {}
+
+void MainWindow::onVAppend() {}
+void MainWindow::onVPrepend() {}
+void MainWindow::onVInsertAt() {}
+void MainWindow::onVGet() {}
+void MainWindow::onVGetFirst() {}
+void MainWindow::onVGetLast() {}
+void MainWindow::onVGetSubsequence() {}
+void MainWindow::onVGetLength() {}
+void MainWindow::onVConcat() {}
+void MainWindow::onVMap() {}
+void MainWindow::onVReduce() {}
+void MainWindow::onVClear() {}
