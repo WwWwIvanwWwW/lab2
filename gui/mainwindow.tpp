@@ -3,6 +3,20 @@
 #include "ui_mainwindow.h"
 
 #define SHOWSTATUSBARTIME 2000
+
+template <> inline QString MainWindow::SeqtoQString(BitSequence *seq)
+{
+	if (!seq)
+		return "nullptr";
+	QString text = "[ ";
+	for (int i = 0; i < seq->GetLength(); ++i) {
+		text += seq->Get(i).GetValue() ? "1" : "0";
+		if (i + 1 < seq->GetLength())
+			text += ", ";
+	}
+	text += " ]";
+	return text;
+}
 template <typename SeqType> QString MainWindow::SeqtoQString(SeqType *seq)
 {
 	QString text = "[ ";

@@ -43,7 +43,7 @@ color: rgb(255, 255, 255);</string>
        <string notr="true">color: rgb(255, 255, 255);</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>5</number>
       </property>
       <widget class="QWidget" name="MutableArraySequence">
        <property name="sizePolicy">
@@ -701,7 +701,7 @@ color: rgb(255, 255, 255);</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <item>
-            <widget class="QSpinBox" name="mlvalue_3">
+            <widget class="QSpinBox" name="mlvalue">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -993,10 +993,10 @@ color: rgb(255, 255, 255);</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
-         <widget class="QTextEdit" name="istextEdit"/>
+         <widget class="QTextEdit" name="iltextEdit"/>
         </item>
         <item>
-         <widget class="QWidget" name="iswidget" native="true">
+         <widget class="QWidget" name="ilwidget" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>1</horstretch>
@@ -1011,7 +1011,7 @@ color: rgb(255, 255, 255);</string>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
-            <widget class="QSpinBox" name="isvalue">
+            <widget class="QSpinBox" name="ilvalue">
              <property name="enabled">
               <bool>true</bool>
              </property>
@@ -1042,7 +1042,7 @@ color: rgb(255, 255, 255);</string>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="islabel">
+            <widget class="QLabel" name="illabel">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1055,7 +1055,7 @@ color: rgb(255, 255, 255);</string>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="isindex">
+            <widget class="QSpinBox" name="ilindex">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1071,7 +1071,7 @@ color: rgb(255, 255, 255);</string>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="islabel2">
+            <widget class="QLabel" name="illabel2">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1084,7 +1084,7 @@ color: rgb(255, 255, 255);</string>
             </widget>
            </item>
            <item>
-            <widget class="QSpinBox" name="isindex2">
+            <widget class="QSpinBox" name="ilindex2">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                <horstretch>0</horstretch>
@@ -1103,9 +1103,9 @@ color: rgb(255, 255, 255);</string>
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="isgridLayout">
+         <layout class="QGridLayout" name="ilgridLayout">
           <item row="2" column="0">
-           <widget class="QPushButton" name="isConcat">
+           <widget class="QPushButton" name="ilConcat">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1121,7 +1121,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QPushButton" name="isPrepend">
+           <widget class="QPushButton" name="ilPrepend">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1137,7 +1137,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="1" column="3">
-           <widget class="QPushButton" name="isGetLength">
+           <widget class="QPushButton" name="ilGetLength">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1150,7 +1150,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="0" column="2">
-           <widget class="QPushButton" name="isInsertAt">
+           <widget class="QPushButton" name="ilInsertAt">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1166,7 +1166,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="1" column="2">
-           <widget class="QPushButton" name="isGetSubsequence">
+           <widget class="QPushButton" name="ilGetSubsequence">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1182,7 +1182,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="2" column="2">
-           <widget class="QPushButton" name="isReduce">
+           <widget class="QPushButton" name="ilReduce">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1198,7 +1198,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="1" column="1">
-           <widget class="QPushButton" name="isGetLast">
+           <widget class="QPushButton" name="ilGetLast">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1214,7 +1214,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="0" column="0">
-           <widget class="QPushButton" name="isAppend">
+           <widget class="QPushButton" name="ilAppend">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1230,7 +1230,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="2" column="3">
-           <widget class="QPushButton" name="isClear">
+           <widget class="QPushButton" name="ilClear">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1246,7 +1246,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QPushButton" name="isGetFirst">
+           <widget class="QPushButton" name="ilGetFirst">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1262,7 +1262,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="0" column="3">
-           <widget class="QPushButton" name="isGet">
+           <widget class="QPushButton" name="ilGet">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1278,7 +1278,7 @@ color: rgb(255, 255, 255);</string>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QPushButton" name="isMap">
+           <widget class="QPushButton" name="ilMap">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
               <horstretch>1</horstretch>
@@ -1340,11 +1340,14 @@ color: rgb(255, 255, 255);</string>
              <property name="styleSheet">
               <string notr="true">color: rgb(255, 255, 255);</string>
              </property>
+             <property name="wrapping">
+              <bool>false</bool>
+             </property>
              <property name="minimum">
-              <number>-2147483647</number>
+              <number>0</number>
              </property>
              <property name="maximum">
-              <number>2147483647</number>
+              <number>1</number>
              </property>
              <property name="singleStep">
               <number>1</number>
@@ -1616,7 +1619,41 @@ color: rgb(255, 255, 255);</string>
          <widget class="QTextEdit" name="vtextEdit"/>
         </item>
         <item>
-         <widget class="QWidget" name="vwidget" native="true">
+         <widget class="QWidget" name="vwidget2" native="true">
+          <layout class="QHBoxLayout" name="horizontalLayout_7">
+           <item>
+            <widget class="QLabel" name="vlabel3">
+             <property name="text">
+              <string>Вектор 1</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="vlineEdit1">
+             <property name="placeholderText">
+              <string>1,2,3,4,5</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="vlabel4">
+             <property name="text">
+              <string>Вектор 2</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="vlineEdit2">
+             <property name="placeholderText">
+              <string>1,2,3,4,5</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <widget class="QWidget" name="vwidget1" native="true">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
             <horstretch>1</horstretch>
@@ -1699,7 +1736,7 @@ color: rgb(255, 255, 255);</string>
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Индекс2:</string>
+              <string>Вектор(1/2)</string>
              </property>
             </widget>
            </item>
@@ -1717,199 +1754,79 @@ color: rgb(255, 255, 255);</string>
                <height>0</height>
               </size>
              </property>
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>2</number>
+             </property>
             </widget>
            </item>
           </layout>
          </widget>
         </item>
         <item>
-         <layout class="QGridLayout" name="vgridLayout">
-          <item row="2" column="3">
-           <widget class="QPushButton" name="vClear">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
+         <layout class="QGridLayout" name="gridLayout_3" rowstretch="0,0,0,0" columnstretch="0,0,0,0">
+          <item row="0" column="0">
+           <widget class="QPushButton" name="vGetSize">
+            <property name="text">
+             <string>GetSize</string>
             </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QPushButton" name="vGet">
+            <property name="text">
+             <string>Get</string>
             </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QPushButton" name="vSet">
+            <property name="text">
+             <string>Set</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QPushButton" name="vPlusEquals">
+            <property name="text">
+             <string>+=</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QPushButton" name="vMinusEquals">
+            <property name="text">
+             <string>-=</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="vMultiplyEquals">
+            <property name="text">
+             <string>*=</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="2">
+           <widget class="QPushButton" name="pushButton_3">
             <property name="text">
              <string>Clear</string>
             </property>
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QPushButton" name="vConcat">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
+           <widget class="QPushButton" name="vNorm">
             <property name="text">
-             <string>Concat</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QPushButton" name="vAppend">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>Append</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="vPrepend">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>Prepend</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="2">
-           <widget class="QPushButton" name="vInsertAt">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>InsertAt</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QPushButton" name="vGetFirst">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>GetFirst</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <widget class="QPushButton" name="vGet">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>Get</string>
-            </property>
-           </widget>
-          </item>
-          <item row="2" column="2">
-           <widget class="QPushButton" name="vReduce">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>Reduce</string>
+             <string>Norm</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QPushButton" name="vMap">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
+           <widget class="QPushButton" name="vScalarProduct">
             <property name="text">
-             <string>Map</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="3">
-           <widget class="QPushButton" name="vGetLength">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string>GetLength</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QPushButton" name="vGetLast">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>GetLast</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QPushButton" name="vGetSubsequence">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>1</horstretch>
-              <verstretch>1</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="styleSheet">
-             <string notr="true">color: rgb(255, 255, 255);</string>
-            </property>
-            <property name="text">
-             <string>GetSubsequence</string>
+             <string>ScalarProduct</string>
             </property>
            </widget>
           </item>

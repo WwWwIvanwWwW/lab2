@@ -94,17 +94,16 @@ class MainWindow : public QMainWindow
 	void onBReduce();
 	void onBClear();
 
-	void onVAppend();
-	void onVPrepend();
-	void onVInsertAt();
+	void onVLineEdit1Enter();
+	void onVLineEdit2Enter();
+	void onVGetSize();
 	void onVGet();
-	void onVGetFirst();
-	void onVGetLast();
-	void onVGetSubsequence();
-	void onVGetLength();
-	void onVConcat();
-	void onVMap();
-	void onVReduce();
+	void onVSet();
+	void onVPlusEquals();
+	void onVMinusEquals();
+	void onVMultiplyEquals();
+	void onVNorm();
+	void onVScalarProduct();
 	void onVClear();
 
   private:
@@ -115,7 +114,8 @@ class MainWindow : public QMainWindow
 	MutableListSequence<int> mlSeq;
 	ImmutableListSequence<int> ilSeq;
 	BitSequence bitSeq;
-	Vector<int> vectorSeq;
+	Vector<int> vSeq1;
+	Vector<int> vSeq2;
 
 	// General methods
 	template <typename SeqType>
@@ -148,6 +148,12 @@ class MainWindow : public QMainWindow
 	// Other methods
 	QString MatoQString(Sequence<int> *maSeq);
 	MutableArraySequence<int> QStringtoMa(QString text);
+
+	// Vector methods
+	void updateVDisplay();
+	Vector<int> parseVector(const QString &text);
+	Vector<int> &getCurrentVector();
+	Vector<int> &getOtherVector();
 };
 
 #endif // MAINWINDOW_H
