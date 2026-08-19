@@ -4,6 +4,4 @@ build/
 LAB_2
 .vscode/
 libs/
-pyside_env/
-__pycache__
 *.cache
