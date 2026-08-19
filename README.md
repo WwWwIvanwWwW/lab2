@@ -1,5 +1,7 @@
 # Сборка
 /build: make
 
-# Запуск
-/python: python3 main.py
+# Сборка и запуск gui
+/gui/buid: cmake ..
+           make
+           ./gui
