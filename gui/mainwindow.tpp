@@ -30,6 +30,26 @@ template <typename SeqType> QString MainWindow::SeqtoQString(SeqType *seq)
 	return text;
 }
 
+template <> inline QString MainWindow::SeqtoQString(LazySequence<int> *seq)
+{
+	if (!seq)
+		return "nullptr";
+
+	QString text = "[ ";
+	int len = seq->GetMaterializedCount();
+	for (int i = 0; i < len; ++i) {
+		try {
+			text += QString::number(seq->Get(i));
+			if (i + 1 < len)
+				text += ", ";
+		} catch (const std::exception &) {
+			text += "?";
+		}
+	}
+	text += " ]";
+	return text;
+}
+
 template <typename SeqType>
 void MainWindow::updateDisplay(SeqType *seq, QTextEdit *display)
 {

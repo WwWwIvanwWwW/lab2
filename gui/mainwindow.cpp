@@ -118,6 +118,41 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->vNorm, &QPushButton::clicked, this, &MainWindow::onVNorm);
 	connect(ui->vScalarProduct, &QPushButton::clicked, this,
 			&MainWindow::onVScalarProduct);
+
+	connect(ui->lGenerate, &QPushButton::clicked, this,
+			&MainWindow::onLazyGenerate);
+	connect(ui->lAppend, &QPushButton::clicked, this,
+			&MainWindow::onLazyAppend);
+	connect(ui->lPrepend, &QPushButton::clicked, this,
+			&MainWindow::onLazyPrepend);
+	connect(ui->lInsertAt, &QPushButton::clicked, this,
+			&MainWindow::onLazyInsertAt);
+	connect(ui->lGet, &QPushButton::clicked, this, &MainWindow::onLazyGet);
+	connect(ui->lGetFirst, &QPushButton::clicked, this,
+			&MainWindow::onLazyGetFirst);
+	connect(ui->lGetLast, &QPushButton::clicked, this,
+			&MainWindow::onLazyGetLast);
+	connect(ui->lGetSubsequence, &QPushButton::clicked, this,
+			&MainWindow::onLazyGetSubsequence);
+	connect(ui->lGetLength, &QPushButton::clicked, this,
+			&MainWindow::onLazyGetLength);
+	connect(ui->lConcat, &QPushButton::clicked, this,
+			&MainWindow::onLazyConcat);
+	connect(ui->lMap, &QPushButton::clicked, this, &MainWindow::onLazyMap);
+	connect(ui->lReduce, &QPushButton::clicked, this,
+			&MainWindow::onLazyReduce);
+	connect(ui->lClear, &QPushButton::clicked, this, &MainWindow::onLazyClear);
+
+	connect(ui->stLoad, &QPushButton::clicked, this, &MainWindow::onStLoad);
+	connect(ui->stRead, &QPushButton::clicked, this, &MainWindow::onStRead);
+	connect(ui->stWrite, &QPushButton::clicked, this, &MainWindow::onStWrite);
+
+	connect(ui->statsLoad, &QPushButton::clicked, this,
+			&MainWindow::onStatsLoad);
+	connect(ui->statsCollect, &QPushButton::clicked, this,
+			&MainWindow::onStatsCollect);
+	connect(ui->statsReset, &QPushButton::clicked, this,
+			&MainWindow::onStatsReset);
 }
 
 MainWindow::~MainWindow() { delete ui; }
@@ -539,4 +574,500 @@ void MainWindow::onVClear()
 		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
 								   SHOWSTATUSBARTIME);
 	}
+}
+
+void MainWindow::updateLazyDisplay()
+{
+	if (!lazySeq) {
+		ui->ltextEdit->setText("Последовательность не создана");
+		return;
+	}
+
+	QString text = SeqtoQString(lazySeq.get());
+	text += "\n\n";
+
+	Cardinal card = lazySeq->GetCardinalLength();
+	if (card.IsInfinite()) {
+		text += "Длина: бесконечная\n";
+		text += "Cardinal: ∞\n";
+	} else {
+		text += "Длина: " + QString::number(lazySeq->GetLength()) + "\n";
+		text += "Cardinal: " + QString::number(card.GetValue()) + "\n";
+	}
+
+	text +=
+		"Материализовано: " + QString::number(lazySeq->GetMaterializedCount());
+
+	ui->ltextEdit->setText(text);
+}
+
+void MainWindow::onLazyGenerate()
+{
+	int type = ui->lType->currentIndex();
+	int count = ui->lspinBox->value();
+
+	if (count <= 0) {
+		showStatus("❌ Количество элементов должно быть > 0", true);
+		return;
+	}
+
+	try {
+		std::function<int(Sequence<int> *)> generator;
+
+		switch (type) {
+		case 0: { // Fibbonacci
+			generator = [](Sequence<int> *seq) -> int {
+				auto *lazy = dynamic_cast<LazySequence<int> *>(seq);
+				if (!lazy)
+					throw std::runtime_error("Invalid context");
+				int len = lazy->GetMaterializedCount();
+				if (len == 0)
+					return 1;
+				if (len == 1)
+					return 1;
+				int a = lazy->Get(len - 2);
+				int b = lazy->Get(len - 1);
+				if (b > std::numeric_limits<int>::max() - a) {
+					throw std::overflow_error("Fibonacci overflow at index " +
+											  std::to_string(len));
+				}
+				return a + b;
+			};
+			int initial[] = {1, 1};
+			MutableArraySequence<int> init(initial, 2);
+			lazySeq = std::make_unique<LazySequence<int>>(generator, &init);
+			break;
+		}
+		case 1: { // Naturals
+			generator = [](Sequence<int> *seq) -> int {
+				auto *lazy = dynamic_cast<LazySequence<int> *>(seq);
+				if (!lazy)
+					throw std::runtime_error("Invalid context");
+				return lazy->GetMaterializedCount() + 1;
+			};
+			lazySeq = std::make_unique<LazySequence<int>>(generator, nullptr);
+			break;
+		}
+		case 2: { // Factorials
+			generator = [](Sequence<int> *seq) -> int {
+				auto *lazy = dynamic_cast<LazySequence<int> *>(seq);
+				if (!lazy)
+					throw std::runtime_error("Invalid context");
+				int len = lazy->GetMaterializedCount();
+				if (len == 0)
+					return 1;
+				int prev = lazy->Get(len - 1);
+				if (prev > std::numeric_limits<int>::max() / (len + 1)) {
+					throw std::overflow_error("Factorial overflow at index " +
+											  std::to_string(len));
+				}
+				return prev * (len + 1);
+			};
+			lazySeq = std::make_unique<LazySequence<int>>(generator, nullptr);
+			break;
+		}
+		case 3: { // Custom
+			QString input = ui->lUserInput->text();
+			if (input.isEmpty()) {
+				showStatus("❌ Введите числа через запятую", true);
+				return;
+			}
+			QStringList parts = input.split(',', Qt::SkipEmptyParts);
+			MutableArraySequence<int> init;
+			for (const QString &part : parts) {
+				bool ok;
+				int val = part.trimmed().toInt(&ok);
+				if (ok)
+					init.Append(val);
+			}
+			if (init.GetLength() == 0) {
+				showStatus("❌ Нет корректных чисел", true);
+				return;
+			}
+			lazySeq = std::make_unique<LazySequence<int>>(&init);
+			break;
+		}
+		default:
+			showStatus("❌ Неизвестный тип", true);
+			return;
+		}
+		if (lazySeq->GetCardinalLength().IsInfinite()) {
+			for (int i = 0; i < count; ++i) {
+				lazySeq->Get(i);
+			}
+		} else {
+			lazySeq->GetLength();
+		}
+
+		updateLazyDisplay();
+		showStatus("✅ Последовательность сгенерирована");
+	} catch (const std::overflow_error &e) {
+		showStatus(QString("❌ Переполнение: %1").arg(e.what()), true);
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyAppend()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	int value = ui->lvalue->value();
+	try {
+		lazySeq->Append(value);
+		updateLazyDisplay();
+		showStatus(QString("✅ Append(%1) выполнен").arg(value));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyPrepend()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	int value = ui->lvalue->value();
+	try {
+		lazySeq->Prepend(value);
+		updateLazyDisplay();
+		showStatus(QString("✅ Prepend(%1) выполнен").arg(value));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyInsertAt()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	int value = ui->lvalue->value();
+	int index = ui->lindex->value();
+	try {
+		lazySeq->InsertAt(value, index);
+		updateLazyDisplay();
+		showStatus(
+			QString("✅ InsertAt(%1, %2) выполнен").arg(value).arg(index));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyGet()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	int index = ui->lindex->value();
+	try {
+		int value = lazySeq->Get(index);
+		QMessageBox::information(
+			this, "Get",
+			QString("Значение по индексу %1: %2").arg(index).arg(value));
+		showStatus(QString("✅ Get(%1) = %2").arg(index).arg(value));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyGetFirst()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	try {
+		int value = lazySeq->GetFirst();
+		QMessageBox::information(this, "GetFirst",
+								 QString("Первый элемент: %1").arg(value));
+		showStatus(QString("✅ GetFirst = %1").arg(value));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyGetLast()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	try {
+		int value = lazySeq->GetLast();
+		QMessageBox::information(this, "GetLast",
+								 QString("Последний элемент: %1").arg(value));
+		showStatus(QString("✅ GetLast = %1").arg(value));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyGetSubsequence()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	int start = ui->lindex->value();
+	int end = ui->lindex2->value();
+	try {
+		auto sub = lazySeq->GetSubsequence(start, end);
+		QString text = SeqtoQString(sub.get());
+		QMessageBox::information(this, "GetSubsequence",
+								 QString("Подпоследовательность [%1, %2]:\n%3")
+									 .arg(start)
+									 .arg(end)
+									 .arg(text));
+		showStatus(
+			QString("✅ GetSubsequence(%1, %2) выполнен").arg(start).arg(end));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyGetLength()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	try {
+		Cardinal card = lazySeq->GetCardinalLength();
+		QString msg;
+		if (card.IsInfinite()) {
+			msg = "Длина: бесконечная\nCardinal: ∞";
+		} else {
+			msg = "Длина: " + QString::number(lazySeq->GetLength()) +
+				  "\nCardinal: " + QString::number(card.GetValue());
+		}
+		QMessageBox::information(this, "GetLength", msg);
+		showStatus("✅ GetLength выполнен");
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyConcat()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	QString input = InputSequence();
+	if (input.isEmpty())
+		return;
+
+	MutableArraySequence<int> other = QStringtoMa(input);
+	try {
+		auto result = lazySeq->Concat(&other);
+		lazySeq = std::unique_ptr<LazySequence<int>>(
+			dynamic_cast<LazySequence<int> *>(result.release()));
+		updateLazyDisplay();
+		showStatus("✅ Concat выполнен");
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyMap()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	try {
+		auto result = lazySeq->Map([](const int &x) { return x * 2; });
+		lazySeq = std::unique_ptr<LazySequence<int>>(
+			dynamic_cast<LazySequence<int> *>(result.release()));
+		updateLazyDisplay();
+		showStatus("✅ Map (x * 2) выполнен");
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyReduce()
+{
+	if (!lazySeq) {
+		showStatus("❌ Сначала сгенерируйте последовательность", true);
+		return;
+	}
+	try {
+		int result = lazySeq->Reduce(
+			[](const int &x, const int &acc) { return x + acc; }, 0);
+		QMessageBox::information(this, "Reduce",
+								 QString("Сумма элементов: %1").arg(result));
+		showStatus(QString("✅ Reduce = %1").arg(result));
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onLazyClear()
+{
+	lazySeq.reset();
+	ui->ltextEdit->setText("Последовательность очищена");
+	showStatus("✅ LazySequence очищена");
+}
+
+void MainWindow::showStatus(const QString &msg, bool error)
+{
+	QString prefix = error ? "❌ " : "✅ ";
+	ui->statusbar->showMessage(prefix + msg, 3000);
+}
+
+void MainWindow::onStLoad()
+{
+	QString input = ui->stlineEdit->text();
+	if (input.isEmpty()) {
+		showStatus("❌ Введите данные через запятую", true);
+		return;
+	}
+
+	try {
+		auto seq = std::make_unique<MutableArraySequence<int>>();
+		QStringList parts = input.split(',', Qt::SkipEmptyParts);
+		for (const QString &part : parts) {
+			bool ok;
+			int val = part.trimmed().toInt(&ok);
+			if (ok)
+				seq->Append(val);
+		}
+
+		stream = std::make_unique<ReadWriteStream<int>>(seq.get());
+		updateStreamDisplay();
+		showStatus("✅ Поток загружен");
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onStRead()
+{
+	if (!stream) {
+		showStatus("❌ Сначала загрузите поток", true);
+		return;
+	}
+
+	try {
+		if (stream->IsEndOfStream()) {
+			showStatus("❌ Конец потока", true);
+			return;
+		}
+		int value = stream->Read();
+		showStatus(QString("✅ Прочитано: %1").arg(value));
+		updateStreamDisplay();
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onStWrite()
+{
+	if (!stream) {
+		showStatus("❌ Сначала загрузите поток", true);
+		return;
+	}
+
+	bool ok;
+	int value = ui->stlineEdit->text().toInt(&ok);
+	if (!ok) {
+		showStatus("❌ Введите целое число", true);
+		return;
+	}
+
+	try {
+		stream->Write(value);
+		showStatus(QString("✅ Записано: %1").arg(value));
+		updateStreamDisplay();
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::updateStreamDisplay()
+{
+	if (!stream) {
+		ui->sttextEdit->setText("Поток не загружен");
+		return;
+	}
+
+	QString text = "Поток:\n";
+	text += "Позиция чтения: " + QString::number(stream->GetPosition()) + "\n";
+	text += "Конец: " + QString(stream->IsEndOfStream() ? "true" : "false");
+
+	ui->sttextEdit->setText(text);
+}
+
+void MainWindow::onStatsLoad()
+{
+	QString input = ui->statsInput->text();
+	if (input.isEmpty()) {
+		showStatus("❌ Введите числа через запятую", true);
+		return;
+	}
+
+	stats.Reset();
+	QStringList parts = input.split(',', Qt::SkipEmptyParts);
+	for (const QString &part : parts) {
+		bool ok;
+		int val = part.trimmed().toInt(&ok);
+		if (ok)
+			stats.Add(val);
+	}
+
+	updateStatsDisplay();
+	showStatus("✅ Данные загружены");
+}
+
+void MainWindow::onStatsCollect()
+{
+	if (stats.GetCount() == 0) {
+		showStatus("❌ Нет данных для анализа", true);
+		return;
+	}
+
+	try {
+		updateStatsDisplay();
+		showStatus("✅ Статистика собрана");
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onStatsReset()
+{
+	stats.Reset();
+	ui->statsDisplay->clear();
+	ui->statsInput->clear();
+	showStatus("✅ Статистика сброшена");
+}
+
+void MainWindow::updateStatsDisplay()
+{
+	if (stats.GetCount() == 0) {
+		ui->statsDisplay->setText("Нет данных");
+		return;
+	}
+
+	QString text;
+	text += "Количество: " + QString::number(stats.GetCount()) + "\n";
+	text += "Сумма: " + QString::number(stats.GetSum()) + "\n";
+	text += "Среднее: " + QString::number(stats.GetMean(), 'f', 4) + "\n";
+	text += "Минимум: " + QString::number(stats.GetMin()) + "\n";
+	text += "Максимум: " + QString::number(stats.GetMax()) + "\n";
+	if (stats.GetCount() >= 2) {
+		text +=
+			"Дисперсия: " + QString::number(stats.GetVariance(), 'f', 4) + "\n";
+		text += "Стандартное отклонение: " +
+				QString::number(stats.GetStdDev(), 'f', 4) + "\n";
+	}
+
+	ui->statsDisplay->setText(text);
 }

@@ -11,6 +11,8 @@ endif()
 include_directories(${CMAKE_SOURCE_DIR}/include)
 include_directories(${CMAKE_SOURCE_DIR}/include/Array)
 include_directories(${CMAKE_SOURCE_DIR}/include/List)
+include_directories(${CMAKE_SOURCE_DIR}/include/LazySequence)
+include_directories(${CMAKE_SOURCE_DIR}/include/Stream)
 
 add_library(sequence_lib SHARED
     src/Bit.cpp
@@ -35,3 +37,9 @@ add_test_with_sources(test_MutableListSequence tests/test_MutableListSequence.cp
 add_test_with_sources(test_ImmutableListSequence tests/test_ImmutableListSequence.cpp)
 add_test_with_sources(test_BitSequence tests/test_BitSequence.cpp src/Bit.cpp src/BitSequence.cpp)
 add_test_with_sources(test_Vector tests/test_Vector.cpp)
+add_test_with_sources(test_LazySequence tests/test_LazySequence.cpp)
+add_test_with_sources(test_Generator tests/test_Generator.cpp)
+add_test_with_sources(test_Cardinal tests/test_Cardinal.cpp)
+add_test_with_sources(test_ReadOnlyStream tests/test_ReadOnlyStream.cpp)
+add_test_with_sources(test_WriteOnlyStream tests/test_ReadOnlyStream.cpp)
+add_test_with_sources(test_StatisticsCollector tests/test_StatisticsCollector.cpp)

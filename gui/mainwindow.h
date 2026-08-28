@@ -4,11 +4,17 @@
 #include "BitSequence.hpp"
 #include "ImmutableArraySequence.hpp"
 #include "ImmutableListSequence.hpp"
+#include "LazySequence.hpp"
 #include "MutableArraySequence.hpp"
 #include "MutableListSequence.hpp"
+#include "ReadOnlyStream.hpp"
+#include "ReadWriteStream.hpp"
+#include "StatisticsCollector.hpp"
 #include "Vector.hpp"
+#include "WriteOnlyStream.hpp"
 #include <QInputDialog>
 #include <QMainWindow>
+#include <QMessageBox>
 #include <QSpinBox>
 #include <QStatusBar>
 #include <QTextEdit>
@@ -106,6 +112,28 @@ class MainWindow : public QMainWindow
 	void onVScalarProduct();
 	void onVClear();
 
+	void onLazyGenerate();
+	void onLazyAppend();
+	void onLazyPrepend();
+	void onLazyInsertAt();
+	void onLazyGet();
+	void onLazyGetFirst();
+	void onLazyGetLast();
+	void onLazyGetSubsequence();
+	void onLazyGetLength();
+	void onLazyConcat();
+	void onLazyMap();
+	void onLazyReduce();
+	void onLazyClear();
+
+	void onStLoad();
+	void onStRead();
+	void onStWrite();
+
+	void onStatsLoad();
+	void onStatsCollect();
+	void onStatsReset();
+
   private:
 	Ui::MainWindow *ui;
 
@@ -116,6 +144,9 @@ class MainWindow : public QMainWindow
 	BitSequence bitSeq;
 	Vector<int> vSeq1;
 	Vector<int> vSeq2;
+	std::unique_ptr<LazySequence<int>> lazySeq;
+	std::unique_ptr<ReadWriteStream<int>> stream;
+	StatisticsCollector<int> stats;
 
 	// General methods
 	template <typename SeqType>
@@ -154,6 +185,12 @@ class MainWindow : public QMainWindow
 	Vector<int> parseVector(const QString &text);
 	Vector<int> &getCurrentVector();
 	Vector<int> &getOtherVector();
+
+	// LazySequence methods
+	void updateLazyDisplay();
+	void updateStreamDisplay();
+	void updateStatsDisplay();
+	void showStatus(const QString &msg, bool error = false);
 };
 
 #endif // MAINWINDOW_H

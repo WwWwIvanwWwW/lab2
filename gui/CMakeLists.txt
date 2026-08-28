@@ -18,6 +18,8 @@ include_directories(
     ${CMAKE_SOURCE_DIR}/../include
     ${CMAKE_SOURCE_DIR}/../include/Array
     ${CMAKE_SOURCE_DIR}/../include/List
+    ${CMAKE_SOURCE_DIR}/../include/LazySequence
+    ${CMAKE_SOURCE_DIR}/../include/Stream
 )
 
 set(TS_FILES gui_ru_RU.ts)
