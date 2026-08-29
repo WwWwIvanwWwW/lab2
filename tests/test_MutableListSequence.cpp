@@ -111,3 +111,102 @@ TEST(MutableListSequenceTest, Concat)
 	auto result = seq1.Concat(&seq2);
 	EXPECT_MUTABLE_LIST((*result), 1, 2, 3, 4);
 }
+
+TEST(MutableListSequenceTestDouble, ConstructorFromArray)
+{
+	double items[] = {1.1, 2.2, 3.3, 4.4};
+	MutableListSequence<double> seq(items, 4);
+	EXPECT_EQ(seq.GetLength(), 4);
+	EXPECT_DOUBLE_EQ(seq.Get(0), 1.1);
+	EXPECT_DOUBLE_EQ(seq.Get(1), 2.2);
+	EXPECT_DOUBLE_EQ(seq.Get(2), 3.3);
+	EXPECT_DOUBLE_EQ(seq.Get(3), 4.4);
+}
+
+TEST(MutableListSequenceTestDouble, AppendAndGet)
+{
+	MutableListSequence<double> seq;
+	seq.Append(1.5);
+	seq.Append(2.7);
+	seq.Append(3.14);
+	EXPECT_EQ(seq.GetLength(), 3);
+	EXPECT_DOUBLE_EQ(seq.Get(0), 1.5);
+	EXPECT_DOUBLE_EQ(seq.Get(1), 2.7);
+	EXPECT_DOUBLE_EQ(seq.Get(2), 3.14);
+}
+
+TEST(MutableListSequenceTestDouble, Prepend)
+{
+	MutableListSequence<double> seq;
+	seq.Append(2.2);
+	seq.Append(3.3);
+	seq.Prepend(1.1);
+	EXPECT_EQ(seq.GetLength(), 3);
+	EXPECT_DOUBLE_EQ(seq.Get(0), 1.1);
+	EXPECT_DOUBLE_EQ(seq.Get(1), 2.2);
+	EXPECT_DOUBLE_EQ(seq.Get(2), 3.3);
+}
+
+TEST(MutableListSequenceTestDouble, InsertAt)
+{
+	double items[] = {1.1, 3.3};
+	MutableListSequence<double> seq(items, 2);
+	seq.InsertAt(2.2, 1);
+	EXPECT_EQ(seq.GetLength(), 3);
+	EXPECT_DOUBLE_EQ(seq.Get(0), 1.1);
+	EXPECT_DOUBLE_EQ(seq.Get(1), 2.2);
+	EXPECT_DOUBLE_EQ(seq.Get(2), 3.3);
+}
+
+TEST(MutableListSequenceTestDouble, GetFirstLast)
+{
+	double items[] = {1.1, 2.2, 3.3};
+	MutableListSequence<double> seq(items, 3);
+	EXPECT_DOUBLE_EQ(seq.GetFirst(), 1.1);
+	EXPECT_DOUBLE_EQ(seq.GetLast(), 3.3);
+}
+
+TEST(MutableListSequenceTestDouble, GetSubsequence)
+{
+	double items[] = {1.1, 2.2, 3.3, 4.4, 5.5};
+	MutableListSequence<double> seq(items, 5);
+	auto sub = seq.GetSubsequence(1, 3);
+	EXPECT_EQ(sub->GetLength(), 3);
+	EXPECT_DOUBLE_EQ(sub->Get(0), 2.2);
+	EXPECT_DOUBLE_EQ(sub->Get(1), 3.3);
+	EXPECT_DOUBLE_EQ(sub->Get(2), 4.4);
+}
+
+TEST(MutableListSequenceTestDouble, Concat)
+{
+	double items1[] = {1.1, 2.2};
+	double items2[] = {3.3, 4.4};
+	MutableListSequence<double> seq1(items1, 2);
+	MutableListSequence<double> seq2(items2, 2);
+	auto result = seq1.Concat(&seq2);
+	EXPECT_EQ(result->GetLength(), 4);
+	EXPECT_DOUBLE_EQ(result->Get(0), 1.1);
+	EXPECT_DOUBLE_EQ(result->Get(1), 2.2);
+	EXPECT_DOUBLE_EQ(result->Get(2), 3.3);
+	EXPECT_DOUBLE_EQ(result->Get(3), 4.4);
+}
+
+TEST(MutableListSequenceTestDouble, Map)
+{
+	double items[] = {1.0, 2.0, 3.0};
+	MutableListSequence<double> seq(items, 3);
+	auto result = seq.Map([](const double &x) { return x * 2.0; });
+	EXPECT_EQ(result->GetLength(), 3);
+	EXPECT_DOUBLE_EQ(result->Get(0), 2.0);
+	EXPECT_DOUBLE_EQ(result->Get(1), 4.0);
+	EXPECT_DOUBLE_EQ(result->Get(2), 6.0);
+}
+
+TEST(MutableListSequenceTestDouble, Reduce)
+{
+	double items[] = {1.0, 2.0, 3.0, 4.0};
+	MutableListSequence<double> seq(items, 4);
+	double sum = seq.Reduce(
+		[](const double &x, const double &acc) { return x + acc; }, 0.0);
+	EXPECT_DOUBLE_EQ(sum, 10.0);
+}

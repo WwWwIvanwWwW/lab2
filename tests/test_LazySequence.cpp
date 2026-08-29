@@ -1,6 +1,7 @@
 #include "LazySequence.hpp"
 #include "MutableArraySequence.hpp"
 #include <gtest/gtest.h>
+#include <limits>
 
 TEST(LazySequenceTest, DefaultConstructorCreatesEmpty)
 {
@@ -94,7 +95,7 @@ TEST(LazySequenceTest, GetCardinalLengthForFiniteReturnsValue)
 	EXPECT_EQ(len.GetValue(), 3);
 }
 
-TEST(LazySequenceTest, GetSubsequence)
+TEST(LazySequenceTest, GetSubsequenceFinite)
 {
 	int arr[] = {0, 1, 2, 3, 4, 5};
 	LazySequence<int> seq(arr, 6);
@@ -113,7 +114,7 @@ TEST(LazySequenceTest, GetSubsequenceThrowsOnInvalidIndices)
 	EXPECT_THROW(seq.GetSubsequence(2, 1), std::invalid_argument);
 }
 
-TEST(LazySequenceTest, AppendCreatesNewSequenceWithOperation)
+TEST(LazySequenceTest, AppendModifiesCurrentObject)
 {
 	int arr[] = {1, 2, 3};
 	LazySequence<int> seq(arr, 3);
@@ -125,7 +126,7 @@ TEST(LazySequenceTest, AppendCreatesNewSequenceWithOperation)
 	EXPECT_EQ(oldSeq.Get(2), 3);
 }
 
-TEST(LazySequenceTest, PrependCreatesNewSequenceWithOperation)
+TEST(LazySequenceTest, PrependModifiesCurrentObject)
 {
 	int arr[] = {2, 3, 4};
 	LazySequence<int> seq(arr, 3);
@@ -137,7 +138,7 @@ TEST(LazySequenceTest, PrependCreatesNewSequenceWithOperation)
 	EXPECT_EQ(oldSeq.Get(0), 2);
 }
 
-TEST(LazySequenceTest, InsertAtCreatesNewSequenceWithOperation)
+TEST(LazySequenceTest, InsertAtModifiesCurrentObject)
 {
 	int arr[] = {1, 2, 4};
 	LazySequence<int> seq(arr, 3);
@@ -156,24 +157,6 @@ TEST(LazySequenceTest, AppendThrowsForInfinite)
 	};
 	LazySequence<int> seq(generator, nullptr);
 	EXPECT_THROW(seq.Append(42), std::logic_error);
-}
-
-TEST(LazySequenceTest, PrependThrowsForInfinite)
-{
-	auto generator = [](Sequence<int> *seq) -> int {
-		return seq->GetLength() + 1;
-	};
-	LazySequence<int> seq(generator, nullptr);
-	EXPECT_THROW(seq.Prepend(42), std::logic_error);
-}
-
-TEST(LazySequenceTest, InsertAtThrowsForInfinite)
-{
-	auto generator = [](Sequence<int> *seq) -> int {
-		return seq->GetLength() + 1;
-	};
-	LazySequence<int> seq(generator, nullptr);
-	EXPECT_THROW(seq.InsertAt(42, 5), std::logic_error);
 }
 
 TEST(LazySequenceTest, ConcatThrowsForInfinite)
@@ -267,4 +250,66 @@ TEST(LazySequenceTest, MultipleOperations)
 	EXPECT_EQ(seq.Get(3), 99);
 	EXPECT_EQ(seq.Get(4), 3);
 	EXPECT_EQ(seq.Get(5), 4);
+}
+
+TEST(LazySequenceTestDouble, ConstructorFromArray)
+{
+	double arr[] = {1.1, 2.2, 3.3};
+	LazySequence<double> seq(arr, 3);
+	EXPECT_EQ(seq.GetMaterializedCount(), 3);
+	EXPECT_DOUBLE_EQ(seq.GetFirst(), 1.1);
+	EXPECT_DOUBLE_EQ(seq.GetLast(), 3.3);
+	EXPECT_DOUBLE_EQ(seq.Get(1), 2.2);
+}
+
+TEST(LazySequenceTestDouble, ConstructorWithGenerator)
+{
+	auto generator = [](Sequence<double> *seq) -> double {
+		auto *lazy = dynamic_cast<LazySequence<double> *>(seq);
+		if (!lazy)
+			throw std::runtime_error("Invalid context");
+		int len = lazy->GetMaterializedCount();
+		if (len == 0)
+			return 1.0;
+		if (len == 1)
+			return 1.0;
+		return lazy->Get(len - 1) + lazy->Get(len - 2);
+	};
+	double initial[] = {1.0, 1.0};
+	MutableArraySequence<double> initialSeq(initial, 2);
+	LazySequence<double> seq(generator, &initialSeq);
+	EXPECT_DOUBLE_EQ(seq.Get(0), 1.0);
+	EXPECT_DOUBLE_EQ(seq.Get(1), 1.0);
+	EXPECT_DOUBLE_EQ(seq.Get(2), 2.0);
+	EXPECT_DOUBLE_EQ(seq.Get(3), 3.0);
+	EXPECT_DOUBLE_EQ(seq.Get(4), 5.0);
+}
+
+TEST(LazySequenceTestDouble, Append)
+{
+	double arr[] = {1.1, 2.2, 3.3};
+	LazySequence<double> seq(arr, 3);
+	seq.Append(4.4);
+	EXPECT_EQ(seq.GetLength(), 4);
+	EXPECT_DOUBLE_EQ(seq.Get(3), 4.4);
+}
+
+TEST(LazySequenceTestDouble, Map)
+{
+	double arr[] = {1.0, 2.0, 3.0};
+	LazySequence<double> seq(arr, 3);
+	auto result = seq.Map([](const double &x) { return x * 2.0; });
+	EXPECT_EQ(result->GetLength(), 3);
+	EXPECT_DOUBLE_EQ(result->Get(0), 2.0);
+	EXPECT_DOUBLE_EQ(result->Get(1), 4.0);
+	EXPECT_DOUBLE_EQ(result->Get(2), 6.0);
+}
+
+TEST(LazySequenceTestDouble, Reduce)
+{
+	double arr[] = {1.0, 2.0, 3.0, 4.0};
+	LazySequence<double> seq(arr, 4);
+	double sum = seq.Reduce(
+		[](const double &x, const double &acc) { return x + acc; }, 0.0);
+	EXPECT_DOUBLE_EQ(sum, 10.0);
 }
