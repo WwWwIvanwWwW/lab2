@@ -99,6 +99,10 @@ class MainWindow : public QMainWindow
 	void onBMap();
 	void onBReduce();
 	void onBClear();
+	void onBAnd();
+	void onBOr();
+	void onBXor();
+	void onBNot();
 
 	void onVLineEdit1Enter();
 	void onVLineEdit2Enter();
@@ -131,6 +135,8 @@ class MainWindow : public QMainWindow
 	void onStWrite();
 
 	void onStatsLoad();
+	void onStatsLoadLazy();
+	void onStatsLoadStream();
 	void onStatsCollect();
 	void onStatsReset();
 
@@ -179,6 +185,11 @@ class MainWindow : public QMainWindow
 	// Other methods
 	QString MatoQString(Sequence<int> *maSeq);
 	MutableArraySequence<int> QStringtoMa(QString text);
+
+	// Bit methods
+	QString BitSeqToString(const BitSequence &seq);
+	void updateBitDisplay();
+	BitSequence inputBitSequence();
 
 	// Vector methods
 	void updateVDisplay();

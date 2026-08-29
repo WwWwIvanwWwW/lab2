@@ -47,6 +47,19 @@ template <class T> void ReadWriteStream<T>::Write(const T &item)
 	++m_writePos;
 }
 
+template <class T> size_t ReadWriteStream<T>::Seek(size_t index)
+{
+	if (!m_isOpen) {
+		throw std::runtime_error("Stream is closed");
+	}
+	if (index >= static_cast<size_t>(m_data->GetLength())) {
+		m_readPos = m_data->GetLength();
+		return m_readPos;
+	}
+	m_readPos = index;
+	return m_readPos;
+}
+
 template <class T> size_t ReadWriteStream<T>::GetPosition() const
 {
 	return m_readPos;

@@ -101,6 +101,10 @@ MainWindow::MainWindow(QWidget *parent)
 	connect(ui->bMap, &QPushButton::clicked, this, &MainWindow::onBMap);
 	connect(ui->bReduce, &QPushButton::clicked, this, &MainWindow::onBReduce);
 	connect(ui->bClear, &QPushButton::clicked, this, &MainWindow::onBClear);
+	connect(ui->bAnd, &QPushButton::clicked, this, &MainWindow::onBAnd);
+	connect(ui->bOr, &QPushButton::clicked, this, &MainWindow::onBOr);
+	connect(ui->bXor, &QPushButton::clicked, this, &MainWindow::onBXor);
+	connect(ui->bNot, &QPushButton::clicked, this, &MainWindow::onBNot);
 
 	connect(ui->vlineEdit1, &QLineEdit::returnPressed, this,
 			&MainWindow::onVLineEdit1Enter);
@@ -149,6 +153,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 	connect(ui->statsLoad, &QPushButton::clicked, this,
 			&MainWindow::onStatsLoad);
+	connect(ui->statsLoadLazy, &QPushButton::clicked, this,
+			&MainWindow::onStatsLoadLazy);
+	connect(ui->statsLoadStream, &QPushButton::clicked, this,
+			&MainWindow::onStatsLoadStream);
 	connect(ui->statsCollect, &QPushButton::clicked, this,
 			&MainWindow::onStatsCollect);
 	connect(ui->statsReset, &QPushButton::clicked, this,
@@ -355,23 +363,318 @@ void MainWindow::onIlClear()
 	}
 }
 
-void MainWindow::onBAppend() {}
-void MainWindow::onBPrepend() {}
-void MainWindow::onBInsertAt() {}
-void MainWindow::onBGet() {}
-void MainWindow::onBGetFirst() {}
-void MainWindow::onBGetLast() {}
-void MainWindow::onBGetSubsequence() {}
-void MainWindow::onBGetLength() {}
-void MainWindow::onBConcat() {}
-void MainWindow::onBMap() {}
-void MainWindow::onBReduce() {}
+QString MainWindow::BitSeqToString(const BitSequence &seq)
+{
+	QString text = "[ ";
+	for (int i = 0; i < seq.GetLength(); ++i) {
+		text += seq.Get(i).GetValue() ? "1" : "0";
+		if (i + 1 < seq.GetLength())
+			text += ", ";
+	}
+	text += " ]";
+	return text;
+}
+
+void MainWindow::updateBitDisplay()
+{
+	QString text = BitSeqToString(bitSeq);
+	text += "\n\nДлина: " + QString::number(bitSeq.GetLength());
+	ui->btextEdit->setText(text);
+}
+
+BitSequence MainWindow::inputBitSequence()
+{
+	bool ok;
+	QString input = QInputDialog::getText(
+		this, "Ввод битовой последовательности",
+		"Введите биты через запятую (0,1):", QLineEdit::Normal, "", &ok);
+	if (!ok || input.isEmpty())
+		return BitSequence();
+
+	BitSequence result;
+	QStringList parts = input.split(',', Qt::SkipEmptyParts);
+	for (const QString &part : parts) {
+		bool ok2;
+		int val = part.trimmed().toInt(&ok2);
+		if (ok2 && (val == 0 || val == 1)) {
+			result.Append(Bit(val));
+		}
+	}
+	return result;
+}
+
+void MainWindow::onBAppend()
+{
+	try {
+		int value = ui->bvalue->value();
+		bitSeq.Append(Bit(value));
+		updateBitDisplay();
+		ui->statusbar->showMessage(QString("✅ Append(%1) выполнен").arg(value),
+								   SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBPrepend()
+{
+	try {
+		int value = ui->bvalue->value();
+		bitSeq.Prepend(Bit(value));
+		updateBitDisplay();
+		ui->statusbar->showMessage(
+			QString("✅ Prepend(%1) выполнен").arg(value), SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBInsertAt()
+{
+	try {
+		int value = ui->bvalue->value();
+		int index = ui->bindex->value();
+		bitSeq.InsertAt(Bit(value), index);
+		updateBitDisplay();
+		ui->statusbar->showMessage(
+			QString("✅ InsertAt(%1, %2) выполнен").arg(value).arg(index),
+			SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBGet()
+{
+	try {
+		int index = ui->bindex->value();
+		Bit value = bitSeq.Get(index);
+		ui->statusbar->showMessage(QString("✅ Get(%1) = %2")
+									   .arg(index)
+									   .arg(value.GetValue() ? "1" : "0"),
+								   SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBGetFirst()
+{
+	try {
+		Bit value = bitSeq.GetFirst();
+		ui->statusbar->showMessage(
+			QString("✅ GetFirst = %1").arg(value.GetValue() ? "1" : "0"),
+			SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBGetLast()
+{
+	try {
+		Bit value = bitSeq.GetLast();
+		ui->statusbar->showMessage(
+			QString("✅ GetLast = %1").arg(value.GetValue() ? "1" : "0"),
+			SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBGetSubsequence()
+{
+	try {
+		int start = ui->bindex->value();
+		int end = ui->bindex2->value();
+		auto subPtr = bitSeq.GetSubsequence(start, end);
+		BitSequence *subSeq = dynamic_cast<BitSequence *>(subPtr.get());
+		if (subSeq) {
+			QString text = BitSeqToString(*subSeq);
+			QMessageBox::information(
+				this, "Подпоследовательность",
+				QString("Подпоследовательность [%1, %2]:\n%3")
+					.arg(start)
+					.arg(end)
+					.arg(text));
+			ui->statusbar->showMessage(
+				QString("✅ GetSubsequence(%1, %2) выполнен")
+					.arg(start)
+					.arg(end),
+				SHOWSTATUSBARTIME);
+		} else {
+			ui->statusbar->showMessage(
+				"❌ Ошибка преобразования GetSubsequence", SHOWSTATUSBARTIME);
+		}
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBGetLength()
+{
+	try {
+		int len = bitSeq.GetLength();
+		ui->statusbar->showMessage(QString("✅ GetLength = %1").arg(len),
+								   SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBConcat()
+{
+	try {
+		BitSequence other = inputBitSequence();
+		if (other.GetLength() == 0) {
+			ui->statusbar->showMessage("❌ Ввод отменён или пуст",
+									   SHOWSTATUSBARTIME);
+			return;
+		}
+		auto resultPtr = bitSeq.Concat(&other);
+		BitSequence *newSeq = dynamic_cast<BitSequence *>(resultPtr.get());
+		if (newSeq) {
+			bitSeq = *newSeq;
+			updateBitDisplay();
+			ui->statusbar->showMessage("✅ Concat выполнен", SHOWSTATUSBARTIME);
+		} else {
+			ui->statusbar->showMessage("❌ Ошибка преобразования Concat",
+									   SHOWSTATUSBARTIME);
+		}
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBMap()
+{
+	try {
+		auto resultPtr =
+			bitSeq.Map([](const Bit &b) -> Bit { return Bit(!b.GetValue()); });
+		if (!resultPtr) {
+			ui->statusbar->showMessage("❌ Map вернул nullptr",
+									   SHOWSTATUSBARTIME);
+			return;
+		}
+		BitSequence *newSeq = dynamic_cast<BitSequence *>(resultPtr.get());
+		if (newSeq) {
+			bitSeq = *newSeq;
+			updateBitDisplay();
+			ui->statusbar->showMessage("✅ Map (NOT) выполнен",
+									   SHOWSTATUSBARTIME);
+		} else {
+			ui->statusbar->showMessage("❌ Ошибка: Map вернул не BitSequence",
+									   SHOWSTATUSBARTIME);
+		}
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBReduce()
+{
+	try {
+		Bit result = bitSeq.Reduce(
+			[](const Bit &x, const Bit &acc) {
+				return Bit(x.GetValue() && acc.GetValue());
+			},
+			Bit(1));
+		int value = result.GetValue() ? 1 : 0;
+		ui->statusbar->showMessage(
+			QString("✅ Reduce (AND всех битов) = %1").arg(value),
+			SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
 void MainWindow::onBClear()
 {
 	try {
 		bitSeq = BitSequence();
-		updateDisplay(&maSeq, ui->btextEdit);
+		updateBitDisplay();
 		ui->statusbar->showMessage("✅ Clear", SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBAnd()
+{
+	try {
+		BitSequence other = inputBitSequence();
+		if (other.GetLength() == 0) {
+			ui->statusbar->showMessage("❌ Ввод отменён или пуст",
+									   SHOWSTATUSBARTIME);
+			return;
+		}
+		BitSequence result = bitSeq & other;
+		bitSeq = result;
+		updateBitDisplay();
+		ui->statusbar->showMessage("✅ AND выполнен", SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBOr()
+{
+	try {
+		BitSequence other = inputBitSequence();
+		if (other.GetLength() == 0) {
+			ui->statusbar->showMessage("❌ Ввод отменён или пуст",
+									   SHOWSTATUSBARTIME);
+			return;
+		}
+		BitSequence result = bitSeq | other;
+		bitSeq = result;
+		updateBitDisplay();
+		ui->statusbar->showMessage("✅ OR выполнен", SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBXor()
+{
+	try {
+		BitSequence other = inputBitSequence();
+		if (other.GetLength() == 0) {
+			ui->statusbar->showMessage("❌ Ввод отменён или пуст",
+									   SHOWSTATUSBARTIME);
+			return;
+		}
+		BitSequence result = bitSeq ^ other;
+		bitSeq = result;
+		updateBitDisplay();
+		ui->statusbar->showMessage("✅ XOR выполнен", SHOWSTATUSBARTIME);
+	} catch (const std::exception &e) {
+		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
+								   SHOWSTATUSBARTIME);
+	}
+}
+
+void MainWindow::onBNot()
+{
+	try {
+		BitSequence result = ~bitSeq;
+		bitSeq = result;
+		updateBitDisplay();
+		ui->statusbar->showMessage("✅ NOT выполнен", SHOWSTATUSBARTIME);
 	} catch (const std::exception &e) {
 		ui->statusbar->showMessage(QString("❌ Ошибка: %1").arg(e.what()),
 								   SHOWSTATUSBARTIME);
@@ -1024,6 +1327,59 @@ void MainWindow::onStatsLoad()
 
 	updateStatsDisplay();
 	showStatus("✅ Данные загружены");
+}
+
+void MainWindow::onStatsLoadLazy()
+{
+	if (!lazySeq) {
+		showStatus("❌ LazySequence не создана", true);
+		return;
+	}
+
+	stats.Reset();
+
+	try {
+		if (lazySeq->GetCardinalLength().IsInfinite()) {
+			for (int i = 0; i < lazySeq->GetMaterializedCount(); ++i) {
+				stats.Add(lazySeq->Get(i));
+			}
+		} else {
+			for (int i = 0; i < lazySeq->GetLength(); ++i) {
+				stats.Add(lazySeq->Get(i));
+			}
+		}
+
+		updateStatsDisplay();
+		showStatus("✅ Данные из LazySequence загружены");
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
+}
+
+void MainWindow::onStatsLoadStream()
+{
+	if (!stream) {
+		showStatus("❌ Stream не создан", true);
+		return;
+	}
+
+	stats.Reset();
+
+	try {
+		size_t savedPos = stream->GetPosition();
+		stream->Seek(0);
+
+		while (!stream->IsEndOfStream()) {
+			stats.Add(stream->Read());
+		}
+
+		stream->Seek(savedPos);
+
+		updateStatsDisplay();
+		showStatus("✅ Данные из Stream загружены");
+	} catch (const std::exception &e) {
+		showStatus(QString("❌ Ошибка: %1").arg(e.what()), true);
+	}
 }
 
 void MainWindow::onStatsCollect()

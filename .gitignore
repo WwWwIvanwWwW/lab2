@@ -5,3 +5,5 @@ LAB_2
 .vscode/
 libs/
 *.cache
+.cache/
+*lupdate

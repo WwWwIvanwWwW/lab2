@@ -14,6 +14,7 @@ template <class T> class ReadWriteStream
 	bool IsEndOfStream() const;
 	T Read();
 	void Write(const T &item);
+	size_t Seek(size_t index);
 	size_t GetPosition() const;
 	size_t GetWritePosition() const;
 
